@@ -1,0 +1,118 @@
+.output a, body, html {
+    color: #aaaaaa;
+}
+
+.inputArea, .right {
+    position: fixed;
+    right: 0
+}
+
+html {
+    height: 100%
+}
+
+body, html {
+    padding: 0;
+    margin: 0;
+    background: #333;
+    background: radial-gradient(ellipse at center, #333 0, #111 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#333333', endColorstr='#111111', GradientType=1);
+    font-family: 'Roboto Mono', 'monospace';
+    font-size: 19px;
+    font-weight: 300
+}
+
+.terminal, .right {
+    vertical-align: top;
+    height: 100%;
+    box-sizing: border-box;
+    padding: 38px
+}
+
+.info {
+    display: none
+}
+
+.inputArea {
+    opacity: 0;
+    bottom: 0;
+    left: 0;
+    box-sizing: border-box;
+    width: 100%;
+    background: #444;
+    border: none;
+    outline: 0
+}
+
+.terminal {
+    width: 70%;
+    float: left;
+    -webkit-filter: url(#chromaticAberation);
+    overflow: auto
+}
+
+.terminal .ansi-magenta-fg {
+    color: rgb(144, 0, 57);
+}
+
+.terminal .ansi-blue-fg {
+    color: rgb(28, 78, 158);
+}
+
+.terminal .ansi-green-fg {
+    color: rgb(0, 140, 20);
+}
+
+.right {
+    width: 30%;
+    float: right;
+    color: #fff;
+    background: #00c0ff;
+    font-weight: 400;
+    font-size: 23px;
+    opacity: .9;
+    top: 0
+}
+
+.thin {
+    font-weight: 300
+}
+
+.nav {
+    margin: 20px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 16px;
+}
+
+.nav a {
+    color: #FFF;
+    text-decoration: none
+}
+
+.nav a:hover {
+    color: #000
+}
+
+@media only screen and (max-width: 600px) {
+    .terminal, .right {
+        float: none;
+        width: 100%;
+        padding: 18px
+    }
+
+    .terminal {
+        margin: 70px 0 30px;
+        font-size: 12px;
+        height: calc(100% - 100px);
+        box-sizing: border-box
+    }
+
+    .nav {
+        display: none
+    }
+
+    .right {
+        height: auto
+    }
+}
