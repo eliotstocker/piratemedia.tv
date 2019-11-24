@@ -35,19 +35,32 @@
 		<div class="terminal"></div>
 		<svg width="0" height="0">
 			<filter id="chromaticAberation">
-		    	<feColorMatrix type="matrix" result="red_"
-							  values="4 0 0 0 0
-							  0 0 0 0 0
-							  0 0 0 0 0
-							  0 0 0 1 0"/>
-				<feOffset in="red_" dx="1" dy="0" result="red"/>
-				<feColorMatrix type="matrix" in="SourceGraphic" result="blue_"
+				<feColorMatrix type="matrix"
+							   in="SourceGraphic"
+							   result="red_"
+							   values="1 0 0 0 0
+									  0 0 0 0 0
+									  0 0 0 0 0
+									  0 0 0 1 0"/>
+				<feOffset in="red_" dx="2" dy="0" result="red"/>
+				<feColorMatrix type="matrix"
+							   in="SourceGraphic"
+							   result="green"
 							   values="0 0 0 0 0
-							   0 3 0 0 0
-							   0 0 10 0 0
-							   0 0 0 1 0"/>
-				<feOffset in="blue_" dx="-1" dy="0" result="blue" />
-				<feBlend mode="screen" in="red" in2="blue" />
+									  0 1 0 0 0
+									  0 0 0 0 0
+									  0 0 0 1 0"/>
+				<feColorMatrix type="matrix"
+							   in="SourceGraphic"
+							   result="blue_"
+							   values="0 0 0 0 0
+									  0 0 0 0 0
+									  0 0 1 0 0
+									  0 0 0 1 0"/>
+				<feOffset in="blue_" dx="-2" dy="0" result="blue"/>
+
+				<feBlend in="red" in2="green" result="rg" mode="screen"/>
+				<feBlend in="rg" in2="blue" mode="screen"/>
 			</filter>
 		</svg>
 		<script>

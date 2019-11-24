@@ -4,7 +4,7 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "start": "npm run build && npx http-server",
+    "start": "npx http-server",
     "build": "npm run build:fs",
     "build:fs": "exportFileSystem ./fs -v fs -o fs.js",
     "test": "echo \"Error: no test specified\" && exit 1"

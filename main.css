@@ -47,20 +47,21 @@ body, html {
 .terminal {
     width: 70%;
     float: left;
-    -webkit-filter: url(#chromaticAberation);
-    overflow: auto
+    filter: url(#chromaticAberation);
+    overflow: auto;
+    color: #ffffff;
 }
 
 .terminal .ansi-magenta-fg {
-    color: rgb(144, 0, 57);
+    color: rgb(233, 0, 109);
 }
 
 .terminal .ansi-blue-fg {
-    color: rgb(28, 78, 158);
+    color: rgb(42, 108, 243);
 }
 
 .terminal .ansi-green-fg {
-    color: rgb(0, 140, 20);
+    color: rgb(0, 210, 28);
 }
 
 .right {
@@ -71,7 +72,8 @@ body, html {
     font-weight: 400;
     font-size: 23px;
     opacity: .9;
-    top: 0
+    top: 0;
+    filter: url(#chromaticAberation);
 }
 
 .thin {
