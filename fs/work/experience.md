@@ -4,7 +4,7 @@
 ### Director of Engineering (Current Role)
 - [ ] 1 Year +
 
-## Senior Engineer
+### Senior Engineer
 - [x] 1 Year
 
 ## Real Time Objects Ltd.
