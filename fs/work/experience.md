@@ -1,25 +1,27 @@
 # Chief Technical Officer
 
-## Senior Engineer (Current Role)
-### Brandwatch
+## Brandwatch
+### Director of Engineering (Current Role)
 - [ ] 1 Year +
 
-## Chief Technical Officer
-### Real Time Objects Ltd.
+## Senior Engineer
 - [x] 1 Year
 
-## Freelance Senior Software Engineer and Consultant
-### Sole Trader: Eliot Stocker Software Services
+## Real Time Objects Ltd.
+### Chief Technical Officer
+- [x] 1 Year
+
+## Sole Trader: Eliot Stocker Software Services
+### Freelance Senior Software Engineer and Consultant
 - [x] 1.5 Years
 
-## Chief Technical Officer
-### Noonan Media Ltd.
+## Noonan Media Ltd.
+### Chief Technical Officer
 - [x] 3 Years
     
-## Head of Engineering
-### Noonan Media Ltd.
+### Head of Engineering
 - [x] 2.5 years
 
-## Music Producer/Engineer
-### Lumen Studio Ltd.
+## Lumen Studio Ltd.
+### Music Producer/Engineer
 - [x] 4 Years
