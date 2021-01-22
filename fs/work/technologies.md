@@ -7,7 +7,6 @@
 * MacOS API
 * Unity 3D
 * Docker
-* Java
 * Ansible
 * Concourse
 * Redis
