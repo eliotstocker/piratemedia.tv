@@ -1,4 +1,4 @@
 node_modules
 .idea
-fs.js
+public/fs.js
 .secret
