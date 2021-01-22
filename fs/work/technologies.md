@@ -1,13 +1,15 @@
 # Some of Technologies that I like to play with:
 			
 * NodeJS
-* Flex
+* Kubernetes
 * Android API
 * iOS API
 * MacOS API
 * Unity 3D
 * Docker
+* Java
 * Ansible
+* Concourse
 * Redis
 * MongoDB
 * SQL
