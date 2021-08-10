@@ -8,7 +8,7 @@ function init() {
         cwd: '/home',
         cursor: 'blink',
         outputAnimation: 'type',
-        animateSpeed: 5,
+        animateSpeed: 10,
         filesystem: fs
     });
 
