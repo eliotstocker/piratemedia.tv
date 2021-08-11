@@ -1,4 +1,4 @@
-# Some of Technologies that I like to play with:
+# Some technologies that I like to play with:
 			
 * NodeJS
 * Kubernetes
@@ -12,7 +12,7 @@
 * Redis
 * MongoDB
 * SQL
-* ElasticSearch
+* Elastic Stack
 * OAuth 2.0
 * AWS
 * Azure

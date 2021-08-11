@@ -1,8 +1,9 @@
-# Some of The programming Languages that iI know in:
+# Some of the programming languages that I have worked with:
 			
 * Java
 * C#
 * JavaScript
+* Typescript
 * Swift
 * Python
 * Go

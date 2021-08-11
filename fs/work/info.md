@@ -1,5 +1,5 @@
 # Eliot Stocker
-## Senior Software Engineer | Consultant | Tech Leader
+## Engineering Leader | Consultant | Architect
 
 Email: [eliot@piratemedia.tv](mailto:eliot@piratemedia.tv)
 

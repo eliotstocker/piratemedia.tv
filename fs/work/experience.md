@@ -1,8 +1,8 @@
-# Chief Technical Officer
+#Experience
 
 ## Brandwatch
 ### Director of Engineering (Current Role)
-- [ ] 1 Year +
+- [ ] 2 Years
 
 ### Senior Engineer
 - [x] 1 Year
