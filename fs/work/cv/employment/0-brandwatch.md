@@ -1,0 +1,21 @@
+# ![BrandwatchLogo](https://pbs.twimg.com/profile_images/1143503379915825153/QBozubV-_400x400.jpg) Brandwatch
+
+## Positions Held
+* Director of Engineering: Oct 2019 - Present
+* Senior Software Engineer: Aug 2018 - Oct 2019
+
+## Company
+One of the big names in social listening, I have grown with the company. From joining in 2018 there were around 250-300 people worldwide, through to merging with Crimson Hexagon in 2019 when the company nearly doubled in size, through to the company being acquired by Cision in 2021 joining a workforce of over 5000.
+Being the largest company I have worked for so far, I have been fortunate enough to work with many great people around the world, and across multiple products and technologies.
+
+## Stack
+The Brandwatch stack is large and varied, I have mostly spent my time in Javascript, Java, Kubernetes, Docker and PostgreSQL based software engineering whilst at Brandwatch, but also brushing up against some Python, Go, Lucene and other technologies withing my time at the company.
+One example stack within the organisation is for a product called "Vizia". This consists of a micro-service architecture of mostly NodeJS backend services and React Frontends, with Postgres and Redis for data storage. All of this is deployed to Kubernetes on Google Kubernetes Engine, with test, build and deployment running in Concourse from a Github hosted monorepo.
+
+## Role
+Initially I wanted to take a step back from the management aspects of engineering, look at some low level technical problems, and gain better insight into the organisation as a whole. This was great as I was able to get a real understanding of the core technologies that Brandwatch products are built on, and appreciate what it takes to build and support an applications of this maturity and scale.
+I was able to spend some time thinking hard about devex, completely rebuilding both the devops pipeline and the developer experience for the widget system within the "Vizia" product. After a year contributing individually it was clear to me that it was time to get back into Leadership. I was very fortunate to be trusted to take on the team that I had previously been a part of as Director of Engineering.
+
+Over time this role morphed into Directing the overall Pushed and Shared Insights technical strategy within Brandwatch. This having teams focused on both the "Vizia" product and parts of the "Consumer Research" product, this role was very varied including everything from large architectural decisions all the way down the managing the day to day bugfixes and tweaks. Managing this tribe felt like a good fit for my technical, architectural, and leadership skills.
+
+In early 2021 engineering started going through a re-organisation, at this time that I was thinking a lot about organisational efficiency and how we might be able to spend more resource on internal developer experience. after working with leadership and writing up a number of proposals we were able to create the Developer Platform tribe, reporting straight to the CTO, focussing on CI/CD, deployment, observability and tooling at first with scope to move beyond this in the future. 

@@ -1,0 +1,25 @@
+#!Shell.js
+
+echo "CV Version:"
+cat /work/cv/version
+cat /work/cv/updated
+
+echo "---"
+
+md /work/cv/title.md
+md /work/cv/contact.md
+
+imageviewer /work/cv/profile.png
+
+md /work/cv/info.md
+
+echo "|| Employment History ||"
+
+md /work/cv/employment/brandwatch.md
+md /work/cv/employment/rto.md
+md /work/cv/employment/freelance.md
+md /work/cv/employment/noonan.md
+
+md /work/cv/references.md
+md /work/cv/hobbies.md
+md /work/cv/footer.md
