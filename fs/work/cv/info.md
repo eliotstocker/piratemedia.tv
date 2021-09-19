@@ -1,16 +1,21 @@
 # Technologies
 
-Recently I have worked closely with architecture based on some of these technologies
+Some notable technologies I have worked heavily with over my career
 
 * JavaScript
+* Typescript
+* React
 * Node JS
 * Go
-* Typescript
 * Java
+* PHP
+* Unity 3D / C#
 * Docker
 * Kubernetes
 * Concourse
 * PostgreSQL
+* ElasticSearch
 * Redis
+* Mongo DB
 
-And of course many more over the course of my career so far
+And of course many more...
