@@ -14,7 +14,7 @@ Some notable technologies I have worked heavily with over my career
 * Kubernetes
 * Concourse
 * PostgreSQL
-* ElasticSearch
+* Elasticsearch
 * Redis
 * Mongo DB
 
