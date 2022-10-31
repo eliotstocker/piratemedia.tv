@@ -1,14 +1,14 @@
 ## Profile
 
-Over the past 13+ years I have built companies, teams, and platforms of all sizes, from small 3 man teams and start-ups, through to multi team groups within scale ups.
+Over the past 13+ years, I have built companies, teams, and platforms of all sizes, from small three-man teams and startups, through to multi-team groups within scaleups.
 
-Initially coming from a background in music production, I bring a different perspective to software engineering from this non traditional background. Many of my roles to date have focused on media, and providing a great developer experience both internally and to third parties, bringing in the valuable skills I gained working in the media and communications industries.
+Initially coming from a background in music production, I bring a different perspective to software engineering from my non-traditional background. Many of my roles to date have focused on media, and developer experience, bringing in the valuable skills I gained working in the media and communications industries.
 
-Platform and Contracts are words that I'm sure many have tired of hearing from me, but I have a strong belief that building strong contracts between systems, as well as the teams building them, nurtures the most effective and efficient engineering organisations, good documentation, APIs and extensibility are key to engineering efficiency and a cohesive platform both internally and externally.
+Platform and Contracts are words that I'm sure many have tired of hearing from me, but I have a strong belief that building strong contracts between systems, as well as the teams building them, nurtures the most effective and efficient engineering organisations. Good documentation, APIs and extensibility are key to engineering efficiency and a cohesive internal and external platform.
 
-My passion is communication, I believe that a message communicated the right way can be so much louder. Weather the medium be video, innfographic, auido, or text. When effort is put into the style and presentation of your output, people want to listen and engage.
+My passion is communication, I believe that a message communicated the right way can be so much louder. Whether the medium is video, infographic, audio, or text. When effort is put into the style and presentation of your output, people want to listen and engage.
 
-Whilst my focus is on leadership, I'm not at all afraid to get my hands dirty, you won't find me shying away from helping members of my teams solve a complex problem.
+Whilst my focus is on leadership, I'm not at all afraid to get my hands dirty, you won't find me shying away from helping members of my teams solve complex problems.
 
 <pb></pb>
 
