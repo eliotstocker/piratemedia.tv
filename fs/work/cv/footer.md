@@ -1,1 +1,1 @@
-Eliot Stocker | © Copyright 2021 | [piratemedia.tv](https://piratemedia.tv)
+Eliot Stocker | © Copyright 2022 | [piratemedia.tv](https://piratemedia.tv)

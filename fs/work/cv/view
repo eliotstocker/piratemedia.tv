@@ -15,10 +15,11 @@ md /work/cv/info.md
 
 echo "|| Employment History ||"
 
-md /work/cv/employment/brandwatch.md
-md /work/cv/employment/rto.md
-md /work/cv/employment/freelance.md
-md /work/cv/employment/noonan.md
+md /work/cv/employment/0-snyk.md
+md /work/cv/employment/10-brandwatch.md
+md /work/cv/employment/20-rto.md
+md /work/cv/employment/30-freelance.md
+md /work/cv/employment/40-noonan.md
 
 md /work/cv/references.md
 md /work/cv/hobbies.md

@@ -1,7 +1,7 @@
-# ![RTOLogo](https://pbs.twimg.com/profile_images/458915562546946048/wmIZ3BiP_400x400.jpeg) RTObjects
+# ![RTObjects Logo](https://pbs.twimg.com/profile_images/458915562546946048/wmIZ3BiP_400x400.jpeg) RTObjects
 
 ## Positions Held
-* Chief Technical Officer: Jun 2017 - Aug 2018
+* __Chief Technical Officer__: Jun 2017 - Aug 2018
 
 ## Company
 Founded by games industry veterans from BigBit Games and Black Rock Studios, and backed by [Collider Accelerator](https://www.collider.io/) this AdTech startup built a Real-time 3D application streaming platform, delivering 3D interactive visuals from existing game engines (Unity, Unreal, and more) to an engaged audience, in adverts, webpages, and in app.

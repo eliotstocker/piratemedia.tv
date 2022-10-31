@@ -1,2 +1,2 @@
 # Eliot Stocker
-## Engineering Leader | Consultant | Technical Architect
+## Engineering Leader | Communicator | Tech Enthusiast | Climber | IoT Nerd
