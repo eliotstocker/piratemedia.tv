@@ -1,7 +1,9 @@
+let term;
+
 function init() {
     gaInit();
 
-    const term = new Terminal({
+    term = new Terminal({
         el: document.querySelector('.terminal'),
         hostname: 'Eli0tz Comput3r',
         profile: '/home/.profile',
@@ -17,10 +19,47 @@ function init() {
         link.addEventListener('click', e => {
             e.preventDefault && e.preventDefault();
             const cmd = e.currentTarget.getAttribute("data-command");
+            const vars = hashToVariables();
+            vars.cmd = cmd;
 
-            term.cli.onCommand(cmd);
+            variablesToHash(vars);
         });
-    })
+    });
+
+    cmdFromHash(true);
+    term.cli.on("exit", () => window.location.href = "https://google.com/");
+}
+
+function hashToVariables() {
+    if(!window.location.hash || window.location.hash === "#" || !window.location.hash.includes("="))  {
+        return {};
+    }
+
+    return [
+        ...(window.location.hash.startsWith("#") ? window.location.hash.substring(1) : window.location.hash).split("&")
+    ].reduce((acc, v) => {
+        [k, v] = v.split("=")
+        return {
+            ...acc,
+            [k]: decodeURIComponent(v)
+        }
+    }, {});
+}
+
+function variablesToHash(vars) {
+    window.location.hash = Object.entries(vars).map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join("&");
+}
+
+function cmdFromHash(listen = false) {
+    console.log(hashToVariables())
+    const {cmd} = hashToVariables();
+    if(cmd) {
+        term.onCommand(cmd);
+    }
+
+    if(listen) {
+        window.addEventListener('hashchange', () => cmdFromHash());
+    }
 }
 
 function gaInit() {
