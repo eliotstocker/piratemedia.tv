@@ -1,8 +1,12 @@
-#Experience
+# Experience
 
-## Brandwatch (_Current_)
-### Director of Engineering (Current Role)
-- [ ] 2 Years
+## Snyk (_Current_)
+### Senior Engineering Manager
+- [ ] 1 Year
+
+## Brandwatch (_3.5 Years_)
+### Director of Engineering
+- [x] 2 Years
 
 ### Senior Engineer
 - [x] 1 Year

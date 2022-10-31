@@ -5,9 +5,9 @@
   "main": "main.js",
   "scripts": {
     "start": "npx http-server",
-    "build": "npm run build:fs",
+    "build": "npm run build:fs && npm run build:cv",
     "build:fs": "exportFileSystem ./fs -v fs -h -o public/fs.js",
-    "build:cv": "mdcv ./fs/work/cv --primaryColor 00c0ff --secondaryColor FF1955",
+    "build:cv": "mdcv ./fs/work/cv --primaryColor 00c0ff --secondaryColor FF1955 -o ./public",
     "test:spelling": "spellchecker --files 'fs/work/**/*.md' '!fs/work/help.md' -l en-GB -d dictionary.txt",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
