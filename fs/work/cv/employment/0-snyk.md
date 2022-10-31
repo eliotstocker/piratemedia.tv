@@ -4,17 +4,17 @@
 * __Senior Engineering Manager__: Feb 2022 - Present
 
 ## Company
-The name in developer first security tooling, Snyk is a unicorm startup that has achived so much in its first 7 years and grown to become a very well used suite of tools within the engineering community.
-Whilst my time at Snyk has been relatively short, I'm happy to have been able to work with such an amazing global pool of tallent.
-Snyk is the fastest paced organisation that I have worked in, and I found many lessons in the callenges, changes and problems that Hypergrowth in these types of scale ups brinng.
+The name in developer first security tooling, Snyk is a unicorn startup that has achieved so much in its first 7 years and grown to become a very well used suite of tools within the engineering community.
+Whilst my time at Snyk has been relatively short, I'm happy to have been able to work with such an amazing global pool of talent.
+Snyk is the fastest paced organisation that I have worked in, and I found many lessons in the challenges, changes and problems that Hyper growth in these types of scale ups bring.
 
 ## Stack
-The Snyk platform primarily consists of JavaScript/TypeScript, Node JS and Golang with PostgreSQL, Mongo DB and Kafka. I have primarily worked with teams in the Golang, Envoy Proxy, Kafka, Terraform, and Kubernetes spaces, but have also touched areas such as Typescript, PostgreSQL, Big Query and more.
+The Snyk platform primarily consists of JavaScript/TypeScript, Node JavaScript and Golang with PostgreSQL, MongoDB and Kafka. I have primarily worked with teams in the Golang, Envoy Proxy, Kafka, Terraform, and Kubernetes spaces, but have also touched areas such as Typescript, PostgreSQL, Big Query and more.
 
 ## Role
-Over my time at  Snyk I managed a number of different teams, under a number of different directors.
-Upon starting at Snyk I ran a team of engineers focussed on internal tools, and responsible for platform governance.
-I later helped to form the current incarnation of the Foundation group focusing of foundation technologies such and Authorisation, Authentication, Interservice communicationn and more. It was here in foundation that I Ran two of the groups three teams for a time.
-Most recently the Data Infrastucture team that I ran in Foundation moved into the Data Products group in order to help establish a vertically integrated data pipeline from events through to visulaisation.
+Over my time at  Snyk I managed a number of teams, under a number of directors.
+Upon starting at Snyk I was tasked with managing an established team of engineers focused on internal tools, and responsible for platform governance.
+I was latter asked to help form the Foundation group focusing on foundation platform wide technologies such as authorisation, authentication, inter-service communication, and more. Here in foundation I took on the role of building and managing two of the groups three new teams.
+Most recently the I and the Data Infrastructure team that I had created in Foundation moved into a new group in order to help establish a vertically integrated data pipeline along with the Data Products division, with a view to enabling engineers within Snyk to more easily visualise and report on data flowing through the platform.
 
-Unfortunatelty due to changes in the economic landscape Snyk had to make some hard cuts of ≈15% of its workforce at the end of 2022, and I was affected by these changes.
+Unfortunately due to changes in the economic landscape Snyk had to make some hard cuts of ≈15% of its workforce at the end of 2022, and I was affected by these changes.
