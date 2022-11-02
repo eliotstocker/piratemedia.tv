@@ -27,3 +27,4 @@ jobs:
         bucket-region: eu-west-1
         dist-id: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
         delete-removed: true
+        invalidation: '/*'
