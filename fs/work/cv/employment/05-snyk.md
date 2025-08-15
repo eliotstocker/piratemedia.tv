@@ -1,4 +1,4 @@
-# ![Snyk Logo](https://pbs.twimg.com/profile_images/1546892102717493248/o9Ha4bVC_400x400.jpg) Snyk
+# ![Snyk Logo](https://avatars.githubusercontent.com/u/12959162?s=200&v=4) Snyk
 
 ## Positions Held
 * __Senior Engineering Manager__: Feb 2022 - Dec 2022
