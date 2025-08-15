@@ -1,4 +1,4 @@
-# ![Brandwatch Logo](https://pbs.twimg.com/profile_images/1143503379915825153/QBozubV-_400x400.jpg) Brandwatch
+# ![Brandwatch Logo](https://avatars.githubusercontent.com/u/807036?s=200&v=4) Brandwatch
 
 ## Positions Held
 * __Director of Engineering__: Oct 2019 - Jan 2022
