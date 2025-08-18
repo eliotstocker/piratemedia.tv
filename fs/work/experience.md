@@ -1,8 +1,12 @@
 # Experience
 
-## Snyk (_Current_)
+## Attest (Current)
+### Director of Engineering
+- [ ] 3 Years
+
+## Snyk (1 Year)
 ### Senior Engineering Manager
-- [ ] 1 Year
+- [x] 1 Year
 
 ## Brandwatch (_3.5 Years_)
 ### Director of Engineering

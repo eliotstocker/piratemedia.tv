@@ -1,7 +1,7 @@
-# ![Snyk Logo](https://pbs.twimg.com/profile_images/1546892102717493248/o9Ha4bVC_400x400.jpg) Snyk
+# ![Snyk Logo](https://avatars.githubusercontent.com/u/12959162?s=200&v=4) Snyk
 
 ## Positions Held
-* __Senior Engineering Manager__: Feb 2022 - Present
+* __Senior Engineering Manager__: Feb 2022 - Dec 2022
 
 ## Company
 The name in developer-first security tooling, Snyk is a unicorn startup that has achieved so much in its first 7 years and has grown to become a very well-used suite of tools within the engineering community.
