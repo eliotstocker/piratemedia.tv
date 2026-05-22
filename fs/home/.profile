@@ -1,4 +1,4 @@
-#!Shell.js
+#!/bin/brsh
 
 # setup aliases for markdown rendering
 alias info="md /work/info.md"

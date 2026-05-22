@@ -61,11 +61,12 @@ class ImageViewer extends Shell.Command {
             return Promise.reject(`${this.arguments[0]}: Is a directory`);
         }
 
-        if(!file.startsWith('data:image/png')) {
-            return Promise.reject(`${this.arguments[0]}: Invalid file type, required png`);
+        let buffer;
+        if(file.startsWith('data:image/png')) {
+            buffer = new _base64ToArrayBuffer(file.substring('data:image/png;base64,'.length));
+        } else {
+            buffer = Buffer.from(file);
         }
-
-        const buffer = new _base64ToArrayBuffer(file.substring('data:image/png;base64,'.length));
 
         return new Promise((resolve, reject) => {
             printDouble(buffer, (err, string) => {

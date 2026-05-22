@@ -1,5 +1,9 @@
 const marked = require('marked');
 const TerminalRenderer = require('marked-terminal');
+const chalk = require('chalk');
+
+// Force ANSI colours — chalk disables them when there is no TTY (e.g. browser)
+chalk.level = 3;
 
 class MD extends Shell.Command {
     get requiresFilesystem() {

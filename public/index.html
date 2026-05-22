@@ -5,55 +5,44 @@
 		<link href='https://fonts.googleapis.com/css?family=Roboto+Mono:400,300' rel='stylesheet' type='text/css'>
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
         <link rel="icon" type="image/png" href="/icon.png" />
+		<link rel="stylesheet" href="//unpkg.com/brsh@2/dist/brsh.css"/>
 		<link rel="stylesheet" href="main.css"/>
-        <script src="//unpkg.com/brsh@1/dist/shell.min.js"></script>
-        <script src="//unpkg.com/brsh@1/dist/terminal.min.js"></script>
-		<script src="fs.js"></script>
-		<script src="main.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+		<script src="main.js?v=3"></script>
 	</head>
 	<body>
-		<div class="right">
-			<span class="thin">eliot</span>stocker
-			<ul class="nav">
-				<li><a href="#" data-command="languages">Languages</a></li>
-				<li><a href="#" data-command="tech">Technologies</a></li>
-				<li><a href="#" data-command="experience">Experience</a></li>
-				<li><a href="#" data-command="contact">Contact</a></li>
-				<li><a href="#" data-command="git status">Github</a></li>
-				<li><a href="#" data-command="sendmail">Email</a></li>
-			</ul>
-		</div>
-		<div class="terminal"></div>
-		<svg width="0" height="0">
-			<filter id="chromaticAberation">
-				<feColorMatrix type="matrix"
-							   in="SourceGraphic"
-							   result="red_"
-							   values="1 0 0 0 0
-									  0 0 0 0 0
-									  0 0 0 0 0
-									  0 0 0 1 0"/>
-				<feOffset in="red_" dx="2" dy="0" result="red"/>
-				<feColorMatrix type="matrix"
-							   in="SourceGraphic"
-							   result="green"
-							   values="0 0 0 0 0
-									  0 1 0 0 0
-									  0 0 0 0 0
-									  0 0 0 1 0"/>
-				<feColorMatrix type="matrix"
-							   in="SourceGraphic"
-							   result="blue_"
-							   values="0 0 0 0 0
-									  0 0 0 0 0
-									  0 0 1 0 0
-									  0 0 0 1 0"/>
-				<feOffset in="blue_" dx="-2" dy="0" result="blue"/>
+		<!-- CRT Screen Shader Overlays -->
+		<canvas id="noise"></canvas>
+		<div class="scanlines"></div>
+		<div class="screen-curve"></div>
 
-				<feBlend in="red" in2="green" result="rg" mode="screen"/>
-				<feBlend in="rg" in2="blue" mode="screen"/>
+		<!-- Barrel Distortion SVG Filter -->
+		<svg id="distortion-filter" width="0" height="0" style="position:absolute">
+			<filter id="crt-distort">
+				<feTurbulence type="fractalNoise" baseFrequency="0.00001" numOctaves="1" result="noise" />
+				<feDisplacementMap in="SourceGraphic" in2="noise" scale="10" xChannelSelector="R" yChannelSelector="G" id="distort-map" />
 			</filter>
 		</svg>
+
+		<!-- Boot Animation Container -->
+		<div id="boot-container"></div>
+
+		<!-- Main Content (hidden during boot) -->
+		<div id="main-content">
+			<div class="right">
+				<span class="thin">eliot</span>stocker
+				<ul class="nav">
+					<li><a href="#" data-command="languages">Languages</a></li>
+					<li><a href="#" data-command="tech">Technologies</a></li>
+					<li><a href="#" data-command="experience">Experience</a></li>
+					<li><a href="#" data-command="contact">Contact</a></li>
+					<li><a href="#" data-command="git status">Github</a></li>
+					<li><a href="#" data-command="sendmail">Email</a></li>
+				</ul>
+			</div>
+			<div class="terminal"></div>
+		</div>
+
 		<script>
 			init();
 		</script>

@@ -1,36 +1,133 @@
+/* ============================================================
+   CSS Custom Properties
+   ============================================================ */
+:root {
+    --aberration: 1.5px;
+    --grain-opacity: 0.12;
+    --scanline-opacity: 0.25;
+    --curving: 60%;
+    --flicker-speed: 0.15s;
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+* { box-sizing: border-box; }
+
 .output a, body, html {
     color: #aaaaaa;
 }
 
-.inputArea, .right {
-    position: fixed;
-    right: 0
-}
-
 html {
-    height: 100%
+    height: 100vh;
+    width: 100vw;
 }
 
 body, html {
     padding: 0;
     margin: 0;
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='16'%3E%3Crect width='12' height='16' fill='white'/%3E%3C/svg%3E") 0 0, auto;
     background: #333;
     background: radial-gradient(ellipse at center, #333 0, #111 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#333333', endColorstr='#111111', GradientType=1);
     font-family: 'Roboto Mono', 'monospace';
     font-size: 19px;
-    font-weight: 300
+    font-weight: 300;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    /* Barrel distortion applied to entire scene */
+    filter: url(#crt-distort);
+    animation: flicker var(--flicker-speed) infinite;
+}
+
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@keyframes flicker {
+    0%, 100% { opacity: 0.98; }
+    50%       { opacity: 1; }
+}
+
+/* ============================================================
+   CRT Shader Overlays
+   ============================================================ */
+#noise {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none;
+    opacity: var(--grain-opacity);
+    z-index: 200;
+}
+
+.scanlines {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(
+        rgba(18, 16, 16, 0) 50%,
+        rgba(0, 0, 0, var(--scanline-opacity)) 50%
+    );
+    background-size: 100% 4px;
+    pointer-events: none;
+    z-index: 190;
+}
+
+.screen-curve {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 180;
+    background: radial-gradient(
+        circle, rgba(0,0,0,0) var(--curving), rgba(0,0,0,0.7) 100%
+    );
+    box-shadow: inset 0 0 150px rgba(0,0,0,1);
+}
+
+/* ============================================================
+   Boot Animation
+   ============================================================ */
+#boot-container {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 100;
+    background: #0a0a0a;
+    transition: opacity 0.6s ease;
+}
+
+#boot-container.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+#main-content {
+    visibility: hidden;
+    width: 100vw;
+    height: 100vh;
+}
+
+#main-content.visible {
+    visibility: visible;
+}
+
+/* ============================================================
+   Layout
+   ============================================================ */
+.inputArea, .right {
+    position: fixed;
+    right: 0;
 }
 
 .terminal, .right {
     vertical-align: top;
     height: 100%;
     box-sizing: border-box;
-    padding: 38px
+    padding: 38px;
 }
 
 .info {
-    display: none
+    display: none;
 }
 
 .inputArea {
@@ -41,17 +138,21 @@ body, html {
     width: 100%;
     background: #444;
     border: none;
-    outline: 0
+    outline: 0;
 }
 
 .terminal {
     width: 70%;
     float: left;
-    filter: url(#chromaticAberation);
     overflow: auto;
     color: #ffffff;
+    /* Chromatic aberration via text-shadow (replaces old SVG filter) */
+    text-shadow:
+        calc(var(--aberration) * -1) 0px 1px rgba(255, 0, 0, 0.5),
+        var(--aberration) 0px 1px rgba(0, 0, 255, 0.5);
 }
 
+/* Override default ANSI colours for a nicer palette */
 .terminal .ansi-magenta-fg {
     color: rgb(233, 0, 109);
 }
@@ -73,11 +174,24 @@ body, html {
     font-size: 23px;
     opacity: .9;
     top: 0;
-    filter: url(#chromaticAberation);
+    /* Chromatic aberration via text-shadow (replaces old SVG filter) */
+    text-shadow:
+        calc(var(--aberration) * -1) 0px 1px rgba(255, 0, 0, 0.5),
+        var(--aberration) 0px 1px rgba(0, 0, 255, 0.5);
+}
+
+@media only screen and (min-width: 601px) {
+    .right {
+        transform: translateX(100%);
+        transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .right.slide-in {
+        transform: translateX(0);
+    }
 }
 
 .thin {
-    font-weight: 300
+    font-weight: 300;
 }
 
 .nav {
@@ -89,32 +203,35 @@ body, html {
 
 .nav a {
     color: #FFF;
-    text-decoration: none
+    text-decoration: none;
 }
 
 .nav a:hover {
-    color: #000
+    color: #000;
 }
 
 @media only screen and (max-width: 600px) {
     .terminal, .right {
         float: none;
         width: 100%;
-        padding: 18px
+        padding: 18px;
     }
 
     .terminal {
-        margin: 70px 0 30px;
+        margin: 35px 0 30px;
         font-size: 12px;
         height: calc(100% - 100px);
-        box-sizing: border-box
+        box-sizing: border-box;
     }
 
     .nav {
-        display: none
+        display: none;
     }
 
     .right {
-        height: auto
+        padding-bottom: 0;
+        background: transparent;
+        color: #00c0ff;
+        height: auto;
     }
 }
