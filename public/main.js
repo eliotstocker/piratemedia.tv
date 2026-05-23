@@ -148,9 +148,9 @@ function startBootAnimation() {
     let bootLogDone        = false;   // true once boot log animation finishes
 
     const asciiLogo = [
-            "┬─╮ ┬   ┬ ╭─╮ ┬─┬ █▀▀ ▀█▀ █▀▀█ █▀▀ █ █ █▀▀ █▀▀█",
-            "├─  │   │ │ │  │  ▀▀█  █  █  █ █   █▀▄ █▀▀ █▄▄▀",
-            "└─╯ └─╯ ╵ ╰─╯  ╵  ▄▄█  █  █▄▄█ █▄▄ █ █ █▄▄ █  █"
+            "┏━━ ╻   ╻ ┏━┓ ━┳━ █▀▀ ▀█▀ █▀▀█ █▀▀ █ █ █▀▀ █▀▀█",
+            "┣━  ┃   ┃ ┃ ┃  ┃  ▀▀█  █  █  █ █   █▀▄ █▀▀ █▄▄▀",
+            "┗━━ ┗━  ╹ ┗━┛  ╹  ▄▄█  █  █▄▄█ █▄▄ █ █ █▄▄ █  █"
     ];
 
     function renderScreenTexture(time = null) {
@@ -407,7 +407,7 @@ function init() {
             cwd:             '/home',
             cursor:          'blink',
             outputAnimation: 'type',
-            animateSpeed:    10,
+            animateSpeed:    20,
             filesystem:      fs.filesystem,
             permissions:     fs.permissions,
             onExit: () => { window.location.href = 'https://google.com/'; }
