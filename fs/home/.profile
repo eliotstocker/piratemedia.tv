@@ -11,6 +11,8 @@ alias experience="md /work/experience.md"
 alias exp="md /work/experience.md"
 alias contact="md /work/contact.md"
 alias email="sendmail"
+alias curriculumvitae="./work/cv/view.sh"
+alias cv="curriculumvitae"
 
 # print initial info
 info

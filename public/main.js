@@ -148,9 +148,9 @@ function startBootAnimation() {
     let bootLogDone        = false;   // true once boot log animation finishes
 
     const asciiLogo = [
-            "┏━━ ╻   ╻ ┏━┓ ━┳━ █▀▀ ▀█▀ █▀▀█ █▀▀ █ █ █▀▀ █▀▀█",
-            "┣━  ┃   ┃ ┃ ┃  ┃  ▀▀█  █  █  █ █   █▀▄ █▀▀ █▄▄▀",
-            "┗━━ ┗━  ╹ ┗━┛  ╹  ▄▄█  █  █▄▄█ █▄▄ █ █ █▄▄ █  █"
+            "┌── ╷   ╷ ╭─╮ ─┬─ █▀▀ ▀█▀ █▀▀█ █▀▀ █ █ █▀▀ █▀▀█",
+            "├─  │   │ │ │  │  ▀▀█  █  █  █ █   █▀▄ █▀▀ █▄▄▀",
+            "└── └─  ╵ ╰─╯  ╵  ▄▄█  █  █▄▄█ █▄▄ █ █ █▄▄ █  █"
     ];
 
     function renderScreenTexture(time = null) {

@@ -25,7 +25,7 @@ md /work/cv/info.md
 echo "|| Employment History ||"
 
 skip_employment=0
-for emp in /work/cv/employment/0-snyk.md /work/cv/employment/10-brandwatch.md /work/cv/employment/20-rto.md /work/cv/employment/30-freelance.md /work/cv/employment/40-noonan.md; do
+for emp in /work/cv/employment/01-attest.md /work/cv/employment/05-snyk.md /work/cv/employment/10-brandwatch.md /work/cv/employment/20-rto.md /work/cv/employment/30-freelance.md /work/cv/employment/40-noonan.md; do
   if [ "$skip_employment" = "0" ]; then
     ask_continue || skip_employment=1
   fi
