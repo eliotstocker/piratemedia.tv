@@ -392,7 +392,9 @@ function init() {
     const scriptsReady = loadScript('//unpkg.com/brsh@2/dist/shell.min.js')
         .then(() => { boot.notifyLoadProgress(1 / 3); return loadScript('//unpkg.com/brsh@2/dist/terminal.min.js'); })
         .then(() => { boot.notifyLoadProgress(2 / 3); return loadScript('fs.js'); })
-        .then(() => {
+        .then(() => globalThis.fs)
+        .then((resolvedFs) => {
+            globalThis.fs = resolvedFs;
             boot.notifyLoadProgress(1);
             boot.notifyScriptsLoaded(); // triggers quick boot log on screen
         });
@@ -408,6 +410,7 @@ function init() {
             cursor:          'blink',
             outputAnimation: 'type',
             animateSpeed:    20,
+            lineWrap:        true,
             filesystem:      fs.filesystem,
             permissions:     fs.permissions,
             onExit: () => { window.location.href = 'https://google.com/'; }

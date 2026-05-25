@@ -1,44 +1,46 @@
-const PNGReader = require('png.js');
 const colors = require('ansi-256-colors');
 
 const CHAR_HALF_BLOCK = String.fromCharCode(9604);
 
-function printDouble (buffer, done) {
-    const reader = new PNGReader(buffer);
-    reader.parse(function (err, png) {
-        if (err) return done(err);
-        let s = '';
-        for (let y = 0; y < png.getHeight() - 1; y += 2) {
-            if (s) s += colors.reset + '\n';
-            for (let x = 0; x < png.getWidth(); x++) {
-                const p1 = png.getPixel(x, y);
-                const p2 = png.getPixel(x, y + 1);
-                const r1 = Math.round(p1[0] / 255 * 5);
-                const g1 = Math.round(p1[1] / 255 * 5);
-                const b1 = Math.round(p1[2] / 255 * 5);
-                const r2 = Math.round(p2[0] / 255 * 5);
-                const g2 = Math.round(p2[1] / 255 * 5);
-                const b2 = Math.round(p2[2] / 255 * 5);
-                if (p1[3] === 0) {
-                    s += colors.reset + ' ';
-                } else {
-                    s += colors.bg.getRgb(r1, g1, b1) + colors.fg.getRgb(r2, g2, b2) + CHAR_HALF_BLOCK;
+function printDouble(dataUri, width) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onerror = () => reject(new Error('Failed to load image'));
+        img.onload = () => {
+            const cols = width || 80;
+            const rows = Math.round(cols * (img.naturalHeight / img.naturalWidth) / 2);
+
+            const canvas = document.createElement('canvas');
+            canvas.width = cols;
+            canvas.height = rows * 2;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, cols, rows * 2);
+            const { data } = ctx.getImageData(0, 0, cols, rows * 2);
+
+            let s = '';
+            for (let y = 0; y < rows * 2 - 1; y += 2) {
+                if (s) s += colors.reset + '\n';
+                for (let x = 0; x < cols; x++) {
+                    const i1 = (y * cols + x) * 4;
+                    const i2 = ((y + 1) * cols + x) * 4;
+                    const r1 = Math.round(data[i1]     / 255 * 5);
+                    const g1 = Math.round(data[i1 + 1] / 255 * 5);
+                    const b1 = Math.round(data[i1 + 2] / 255 * 5);
+                    const r2 = Math.round(data[i2]     / 255 * 5);
+                    const g2 = Math.round(data[i2 + 1] / 255 * 5);
+                    const b2 = Math.round(data[i2 + 2] / 255 * 5);
+                    if (data[i1 + 3] === 0) {
+                        s += colors.reset + ' ';
+                    } else {
+                        s += colors.bg.getRgb(r1, g1, b1) + colors.fg.getRgb(r2, g2, b2) + CHAR_HALF_BLOCK;
+                    }
                 }
             }
-        }
-        s += colors.reset;
-        done(null, s)
-    })
-}
-
-function _base64ToArrayBuffer(base64) {
-    const binary_string =  window.atob(base64);
-    const len = binary_string.length;
-    const bytes = new Uint8Array( len );
-    for (let i = 0; i < len; i++)        {
-        bytes[i] = binary_string.charCodeAt(i);
-    }
-    return bytes.buffer;
+            s += colors.reset;
+            resolve(s);
+        };
+        img.src = dataUri;
+    });
 }
 
 class ImageViewer extends Shell.Command {
@@ -47,35 +49,29 @@ class ImageViewer extends Shell.Command {
     }
 
     run() {
-        if(this.arguments.length !== 1) {
-            return Promise.reject('ImageViewer command requires a single argument');
+        if (this.arguments.length < 1 || this.arguments.length > 2) {
+            return Promise.reject('Usage: imageviewer <file> [width]');
         }
 
         const file = this.fs.getFileByPath(this.arguments[0]);
 
-        if(!file) {
+        if (!file) {
             return Promise.reject(`${this.arguments[0]}: No such file or directory`);
         }
 
-        if(file.constructor === Object) {
+        if (file.constructor === Object) {
             return Promise.reject(`${this.arguments[0]}: Is a directory`);
         }
 
-        let buffer;
-        if(file.startsWith('data:image/png')) {
-            buffer = new _base64ToArrayBuffer(file.substring('data:image/png;base64,'.length));
-        } else {
-            buffer = Buffer.from(file);
+        const cols = parseInt(this.context.getVar('COLUMNS'), 10) || 80;
+        const width = this.arguments[1] ? parseInt(this.arguments[1], 10) : cols;
+
+        const fileStr = file.toString();
+        if (!fileStr.startsWith('data:')) {
+            return Promise.reject(`${this.arguments[0]}: Unsupported file format`);
         }
 
-        return new Promise((resolve, reject) => {
-            printDouble(buffer, (err, string) => {
-                if(err) {
-                    return reject(err);
-                }
-                return resolve(string);
-            });
-        });
+        return printDouble(fileStr, width);
     }
 }
 

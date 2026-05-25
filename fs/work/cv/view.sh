@@ -18,7 +18,7 @@ echo "---"
 md /work/cv/title.md
 md /work/cv/contact.md
 
-imageviewer /work/cv/profile.png
+imageviewer /work/cv/profile.jpg 40
 
 md /work/cv/info.md
 
