@@ -21,7 +21,7 @@
     "mdcv": "github:eliotstocker/mdcv"
   },
   "devDependencies": {
-    "brsh": "^3.0.0",
+    "brsh": "^3.1.0",
     "spellchecker-cli": "^6.0.2"
   }
 }

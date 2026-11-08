@@ -40,5 +40,5 @@ md /work/cv/footer.md
 md /work/cv/download.md
 
 echo " "
-echo -e "\e[1;38;2;0;192;255mTip:\e[0m You can ask questions about my experience using: \e[1;38;2;255;25;85maskcv \x22questions about Eliot\x27s experience\x22\e[0m"
+echo -e "\e[1;38;2;0;192;255mTip:\e[0m You can ask questions about my experience using: \e[1;38;2;255;25;85maskcv \"questions about Eliot's experience\"\e[0m"
 echo " "
