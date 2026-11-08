@@ -1,0 +1,3 @@
+#!/bin/brsh
+
+/work/cv/view.sh "$@"

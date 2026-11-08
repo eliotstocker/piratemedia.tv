@@ -9,6 +9,8 @@
 | git status      |       | Goto my github account       |
 | sendmail        | email | Send Eliot an email          |
 | curriculumvitae | cv    | View Eliots CV in this shell |
+| /cv             | cv    | View Eliots CV in this shell |
 | /projects       | projects | View Eliots open source projects |
+| askcv           |       | Ask questions about Eliots experience using AI |
 
 *PS: This shell is unix like, if you're into it, you might find other interesting stuff in the file system*

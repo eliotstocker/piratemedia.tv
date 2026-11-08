@@ -1,0 +1,3 @@
+#!/bin/brsh
+
+askcv "$@"

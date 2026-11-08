@@ -425,6 +425,23 @@ function init() {
             term.cli.context.setCommand(Wbt);
         }
 
+        if (term.cli && term.cli.constructor && term.cli.constructor.prototype) {
+            const origOnCommand = term.cli.constructor.prototype.onCommand;
+            term.cli.constructor.prototype.onCommand = async function(cmdLine, ...rest) {
+                if (typeof cmdLine === 'string') {
+                    const trimmed = cmdLine.trim();
+                    const firstSpace = trimmed.indexOf(' ');
+                    const firstWord = firstSpace === -1 ? trimmed : trimmed.slice(0, firstSpace);
+                    const alias = this.context.getAlias(firstWord);
+                    if (alias && firstSpace !== -1) {
+                        const expanded = alias + ' ' + trimmed.slice(firstSpace + 1);
+                        return origOnCommand.call(this, expanded, ...rest);
+                    }
+                }
+                return origOnCommand.call(this, cmdLine, ...rest);
+            };
+        }
+
         const nav = document.querySelectorAll('.nav a');
         nav.forEach(link => {
             link.addEventListener('click', e => {
