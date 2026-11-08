@@ -219,7 +219,7 @@ body {
 
     .terminal {
         margin: 35px 0 30px;
-        font-size: 12px;
+        font-size: 10px;
         height: calc(100% - 100px);
         box-sizing: border-box;
     }
