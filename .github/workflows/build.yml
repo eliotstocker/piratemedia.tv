@@ -28,3 +28,18 @@ jobs:
         dist-id: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
         delete-removed: true
         invalidation: '/*'
+    - name: Deploy route aliases (S3 & CloudFront)
+      run: |
+        for key in "index.html" "projects" "projects/" "projects/index.html"; do
+          aws s3api put-object \
+            --region eu-west-1 \
+            --bucket piratemedia.tv \
+            --key "$key" \
+            --body public/index.html \
+            --content-type "text/html; charset=utf-8" \
+            --acl public-read
+        done
+        aws cloudfront create-invalidation \
+          --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+          --paths "/projects" "/projects/" "/projects/*" "/index.html"
+
