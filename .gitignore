@@ -1,5 +1,6 @@
 node_modules
 .idea
 public/fs.*
+public/projects
 .secret
 cv.pdf

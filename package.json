@@ -5,9 +5,10 @@
   "main": "main.js",
   "scripts": {
     "start": "npx http-server",
-    "build": "npm run build:fs && npm run build:cv",
+    "build": "npm run build:fs && npm run build:cv && npm run build:routes",
     "build:fs": "exportFileSystem ./fs -v fs --compress -h -o public/fs.js",
     "build:cv": "mdcv ./fs/work/cv --primaryColor 00c0ff --secondaryColor FF1955 -o ./public",
+    "build:routes": "mkdir -p public/projects && cp public/index.html public/projects/index.html",
     "test:spelling": "spellchecker --files 'fs/work/**/*.md' '!fs/work/help.md' -l en-GB -d dictionary.txt",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

@@ -391,7 +391,7 @@ function init() {
     // Load scripts in dependency order, updating the loading bar after each
     const scriptsReady = loadScript('//unpkg.com/brsh@2/dist/shell.min.js')
         .then(() => { boot.notifyLoadProgress(1 / 3); return loadScript('//unpkg.com/brsh@2/dist/terminal.min.js'); })
-        .then(() => { boot.notifyLoadProgress(2 / 3); return loadScript('fs.js'); })
+        .then(() => { boot.notifyLoadProgress(2 / 3); return loadScript('/fs.js'); })
         .then(() => globalThis.fs)
         .then((resolvedFs) => {
             globalThis.fs = resolvedFs;
@@ -462,10 +462,23 @@ function variablesToHash(vars) {
     window.location.hash = Object.entries(vars).map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join('&');
 }
 
+function cmdFromPath() {
+    const pathname = window.location.pathname.replace(/\/index\.html$/, '').replace(/\/+$/, '');
+    if (!pathname || pathname === '') {
+        return null;
+    }
+    return decodeURIComponent(pathname);
+}
+
 function cmdFromHash(listen = false) {
     const { cmd } = hashToVariables();
     if (cmd) {
         term.onCommand(cmd);
+    } else if (listen) {
+        const pathCmd = cmdFromPath();
+        if (pathCmd) {
+            term.onCommand(pathCmd);
+        }
     }
     if (listen) {
         window.addEventListener('hashchange', () => cmdFromHash());
