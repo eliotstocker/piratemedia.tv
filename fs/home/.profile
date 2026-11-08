@@ -14,6 +14,3 @@ alias email="sendmail"
 alias curriculumvitae="./work/cv/view.sh"
 alias cv="curriculumvitae"
 alias projects="/projects"
-
-# print initial info
-info

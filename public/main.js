@@ -390,8 +390,9 @@ function init() {
 
     // Load scripts in dependency order, updating the loading bar after each
     const scriptsReady = loadScript('//unpkg.com/brsh@2/dist/shell.min.js')
-        .then(() => { boot.notifyLoadProgress(1 / 3); return loadScript('//unpkg.com/brsh@2/dist/terminal.min.js'); })
-        .then(() => { boot.notifyLoadProgress(2 / 3); return loadScript('/fs.js'); })
+        .then(() => { boot.notifyLoadProgress(1 / 4); return loadScript('//unpkg.com/brsh@2/dist/terminal.min.js'); })
+        .then(() => { boot.notifyLoadProgress(2 / 4); return loadScript('//unpkg.com/brsh@2/dist/wbt.min.js'); })
+        .then(() => { boot.notifyLoadProgress(3 / 4); return loadScript('/fs.js'); })
         .then(() => globalThis.fs)
         .then((resolvedFs) => {
             globalThis.fs = resolvedFs;
@@ -415,6 +416,14 @@ function init() {
             permissions:     fs.permissions,
             onExit: () => { window.location.href = 'https://google.com/'; }
         });
+
+        if (globalThis.Wbt) {
+            const LocalCommand = Object.getPrototypeOf(term.cli.context.getCommand('cd'));
+            if (LocalCommand && !(Wbt.prototype instanceof LocalCommand)) {
+                Object.setPrototypeOf(Wbt.prototype, LocalCommand.prototype);
+            }
+            term.cli.context.setCommand(Wbt);
+        }
 
         const nav = document.querySelectorAll('.nav a');
         nav.forEach(link => {
