@@ -382,6 +382,22 @@ function loadScript(src) {
     });
 }
 
+async function loadFilesystem(url) {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Failed to fetch filesystem from ${url}: HTTP ${res.status}`);
+    const buf = await res.arrayBuffer();
+    const u8 = new Uint8Array(buf);
+    if (u8[0] === 0x1f && u8[1] === 0x8b) {
+        const ds = new DecompressionStream('gzip');
+        const writer = ds.writable.getWriter();
+        writer.write(u8);
+        writer.close();
+        const decompressed = await new Response(ds.readable).arrayBuffer();
+        return { filesystem: new Uint8Array(decompressed), permissions: {} };
+    }
+    return { filesystem: u8, permissions: {} };
+}
+
 function init() {
     gaInit();
     startNoise();
@@ -392,8 +408,7 @@ function init() {
     const scriptsReady = loadScript('//unpkg.com/brsh@3/dist/shell.min.js')
         .then(() => { boot.notifyLoadProgress(1 / 4); return loadScript('//unpkg.com/brsh@3/dist/terminal.min.js'); })
         .then(() => { boot.notifyLoadProgress(2 / 4); return loadScript('//unpkg.com/brsh@3/dist/wbt.min.js'); })
-        .then(() => { boot.notifyLoadProgress(3 / 4); return loadScript('/fs.js'); })
-        .then(() => globalThis.fs)
+        .then(() => { boot.notifyLoadProgress(3 / 4); return loadFilesystem('/fs.brfs'); })
         .then((resolvedFs) => {
             globalThis.fs = resolvedFs;
             boot.notifyLoadProgress(1);
