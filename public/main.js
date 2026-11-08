@@ -389,9 +389,9 @@ function init() {
     const boot = startBootAnimation();
 
     // Load scripts in dependency order, updating the loading bar after each
-    const scriptsReady = loadScript('//unpkg.com/brsh@2/dist/shell.min.js')
-        .then(() => { boot.notifyLoadProgress(1 / 4); return loadScript('//unpkg.com/brsh@2/dist/terminal.min.js'); })
-        .then(() => { boot.notifyLoadProgress(2 / 4); return loadScript('//unpkg.com/brsh@2/dist/wbt.min.js'); })
+    const scriptsReady = loadScript('//unpkg.com/brsh@3/dist/shell.min.js')
+        .then(() => { boot.notifyLoadProgress(1 / 4); return loadScript('//unpkg.com/brsh@3/dist/terminal.min.js'); })
+        .then(() => { boot.notifyLoadProgress(2 / 4); return loadScript('//unpkg.com/brsh@3/dist/wbt.min.js'); })
         .then(() => { boot.notifyLoadProgress(3 / 4); return loadScript('/fs.js'); })
         .then(() => globalThis.fs)
         .then((resolvedFs) => {
