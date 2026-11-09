@@ -12,11 +12,18 @@ if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
   echo "  askcv \"Tell me about Eliot's leadership experience\""
   echo "  askcv \"What technologies does Eliot have experience with?\""
 else
-  which wllama > /dev/null || wbt install wllama
+  which wllama > /dev/null 2>&1 || wbt install wllama
 
   if [ $# -gt 0 ]; then
-    wllama --hf Qwen/Qwen2.5-0.5B-Instruct-GGUF --quant Q4_K_M -s "$(cat /work/cv/system_prompt.txt)" -p "$*"
+    wllama \
+      --hf unsloth/Qwen3.5-2B-GGUF \
+      --quant Q4_K_M \
+      -s "$(cat /work/cv/system_prompt.txt)" \
+      -p "$*"
   else
-    wllama --hf Qwen/Qwen2.5-0.5B-Instruct-GGUF --quant Q4_K_M -s "$(cat /work/cv/system_prompt.txt)"
+    wllama \
+      --hf unsloth/Qwen3.5-2B-GGUF \
+      --quant Q4_K_M \
+      -s "$(cat /work/cv/system_prompt.txt)"
   fi
 fi
