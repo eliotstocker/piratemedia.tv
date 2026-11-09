@@ -12,5 +12,6 @@
 | /cv             | cv    | View Eliots CV in this shell |
 | /projects       | projects | View Eliots open source projects |
 | askcv           |       | Ask questions about Eliots experience using AI |
+| reset           | factory-reset | Reset filesystem to factory defaults |
 
 *PS: This shell is unix like, if you're into it, you might find other interesting stuff in the file system*

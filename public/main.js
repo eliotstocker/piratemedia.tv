@@ -382,18 +382,100 @@ function loadScript(src) {
     });
 }
 
+const FS_STORAGE_KEY = 'pmtv-rootfs';
+const FS_HASH_KEY = 'pmtv-fs-hash';
+
+async function computeBufferHash(buf) {
+    if (window.crypto && window.crypto.subtle && typeof window.crypto.subtle.digest === 'function') {
+        const hashBuf = await window.crypto.subtle.digest('SHA-256', buf);
+        return Array.from(new Uint8Array(hashBuf))
+            .map(b => b.toString(16).padStart(2, '0'))
+            .join('');
+    }
+    const u8 = new Uint8Array(buf);
+    let h = 0x811c9dc5;
+    for (let i = 0; i < u8.length; i++) {
+        h ^= u8[i];
+        h = Math.imul(h, 0x01000193);
+    }
+    return (h >>> 0).toString(16);
+}
+
+async function resetFilesystem() {
+    try {
+        localStorage.removeItem(FS_HASH_KEY);
+    } catch (_) {}
+    if (typeof indexedDB !== 'undefined') {
+        try {
+            await new Promise((resolve) => {
+                const req = indexedDB.deleteDatabase('brsh_fs_storage');
+                req.onsuccess = () => resolve();
+                req.onerror = () => resolve();
+                req.onblocked = () => resolve();
+            });
+        } catch (_) {}
+    }
+}
+globalThis.resetFilesystem = resetFilesystem;
+
 async function loadFilesystem(url) {
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('reset') || window.location.hash === '#reset') {
+            console.log('Reset parameter detected. Purging persisted filesystem.');
+            await resetFilesystem();
+            if (urlParams.has('reset')) {
+                urlParams.delete('reset');
+                const newSearch = urlParams.toString();
+                const newUrl = window.location.pathname + (newSearch ? '?' + newSearch : '') + window.location.hash;
+                window.history.replaceState(null, '', newUrl);
+            }
+        }
+    } catch (_) {}
+
     const res = await fetch(url);
     if (!res.ok) throw new Error(`Failed to fetch filesystem from ${url}: HTTP ${res.status}`);
     const buf = await res.arrayBuffer();
-    const u8 = new Uint8Array(buf);
+    const serverHash = await computeBufferHash(buf);
+
+    let savedHash = null;
+    try {
+        savedHash = localStorage.getItem(FS_HASH_KEY);
+    } catch (_) {}
+
+    // Check if we have a persisted snapshot that matches the current server build
+    if (savedHash && savedHash === serverHash && globalThis.Shell && globalThis.Shell.Storage) {
+        try {
+            const savedFs = await Shell.Storage.load(FS_STORAGE_KEY);
+            if (savedFs && savedFs.filesystem && typeof savedFs.filesystem === 'object') {
+                console.log('Loaded persisted filesystem snapshot from IndexedDB.');
+                return savedFs;
+            }
+        } catch (err) {
+            console.warn('Failed to load persisted filesystem snapshot, resetting to server image:', err);
+            await resetFilesystem();
+        }
+    } else if (savedHash && savedHash !== serverHash) {
+        console.log('New filesystem build detected. Resetting to server image.');
+        await resetFilesystem();
+    }
+
+    let u8 = new Uint8Array(buf);
     if (u8[0] === 0x1f && u8[1] === 0x8b) {
         const ds = new DecompressionStream('gzip');
         const writer = ds.writable.getWriter();
         writer.write(u8);
         writer.close();
         const decompressed = await new Response(ds.readable).arrayBuffer();
-        return { filesystem: new Uint8Array(decompressed), permissions: {} };
+        u8 = new Uint8Array(decompressed);
+    }
+
+    try {
+        localStorage.setItem(FS_HASH_KEY, serverHash);
+    } catch (_) {}
+
+    if (globalThis.Shell && globalThis.Shell.BinaryContainer) {
+        return globalThis.Shell.BinaryContainer.deserializeBinaryFilesystem(u8);
     }
     return { filesystem: u8, permissions: {} };
 }
@@ -417,7 +499,7 @@ function init() {
 
     
     // Initialise Terminal as soon as scripts are loaded (hidden behind boot screen)
-    scriptsReady.then(() => {
+    scriptsReady.then(async () => {
         if (globalThis.Terminal && globalThis.Terminal.prototype) {
             Terminal.prototype._measureAndSetSize = function() {
                 if (!this._charMeasure || !this._el || typeof this._el.getBoundingClientRect !== 'function') return;
@@ -448,7 +530,7 @@ function init() {
             };
         }
 
-        term = new Terminal({
+        const termOptions = {
             el:              document.querySelector('.terminal'),
             hostname:        BOOT_HOSTNAME,
             profile:         '/home/.profile',
@@ -459,8 +541,21 @@ function init() {
             lineWrap:        true,
             filesystem:      fs.filesystem,
             permissions:     fs.permissions,
+            onFsChange:      globalThis.Shell && globalThis.Shell.Storage ? globalThis.Shell.Storage.createAutoSave(FS_STORAGE_KEY) : null,
             onExit: () => { window.location.href = 'https://google.com/'; }
-        });
+        };
+
+        try {
+            term = new Terminal(termOptions);
+        } catch (err) {
+            console.error('Terminal init failed with current filesystem, attempting fallback to factory default:', err);
+            await resetFilesystem();
+            const freshFs = await loadFilesystem('/fs.brfs');
+            term = new Terminal(Object.assign({}, termOptions, {
+                filesystem: freshFs.filesystem,
+                permissions: freshFs.permissions
+            }));
+        }
 
         globalThis.term = term;
 
@@ -478,12 +573,31 @@ function init() {
             });
         }
 
-        if (globalThis.Wbt) {
-            const LocalCommand = Object.getPrototypeOf(term.cli.context.getCommand('cd'));
-            if (LocalCommand && !(Wbt.prototype instanceof LocalCommand)) {
+        const LocalCommand = Object.getPrototypeOf(term.cli.context.getCommand('cd'));
+
+        if (globalThis.Wbt && LocalCommand) {
+            if (!(Wbt.prototype instanceof LocalCommand)) {
                 Object.setPrototypeOf(Wbt.prototype, LocalCommand.prototype);
             }
             term.cli.context.setCommand(Wbt);
+        }
+
+        if (LocalCommand) {
+            class ResetCommand extends LocalCommand {
+                static get name() { return 'reset'; }
+                async run() {
+                    this.write('Resetting terminal filesystem to factory defaults...\r\n');
+                    if (typeof globalThis.resetFilesystem === 'function') {
+                        await globalThis.resetFilesystem();
+                    }
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 400);
+                    return Promise.resolve();
+                }
+            }
+            term.cli.context.setCommand(ResetCommand);
+            term.cli.context.setAlias('factory-reset', 'reset');
         }
 
         if (term.cli && term.cli.constructor && term.cli.constructor.prototype) {
