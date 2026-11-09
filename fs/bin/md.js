@@ -25,8 +25,9 @@ class MD extends Shell.Command {
             return Promise.reject(`${this.arguments[0]}: Is a directory`);
         }
 
+        const cols = parseInt(this.context.getVar('COLUMNS'), 10) || 80;
         marked.setOptions({
-            renderer: new TerminalRenderer()
+            renderer: new TerminalRenderer({ width: cols })
         });
 
         try {

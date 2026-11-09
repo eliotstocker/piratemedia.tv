@@ -417,7 +417,37 @@ function init() {
 
     
     // Initialise Terminal as soon as scripts are loaded (hidden behind boot screen)
-    scriptsReady.then(() => {        
+    scriptsReady.then(() => {
+        if (globalThis.Terminal && globalThis.Terminal.prototype) {
+            Terminal.prototype._measureAndSetSize = function() {
+                if (!this._charMeasure || !this._el || typeof this._el.getBoundingClientRect !== 'function') return;
+                const charRect = this._charMeasure.getBoundingClientRect();
+                const elRect = this._el.getBoundingClientRect();
+                if (!charRect || !elRect || !charRect.width || !charRect.height || !elRect.width) return;
+
+                const style = window.getComputedStyle(this._el);
+                const padLeft = parseFloat(style.paddingLeft) || 0;
+                const padRight = parseFloat(style.paddingRight) || 0;
+                const padTop = parseFloat(style.paddingTop) || 0;
+                const padBottom = parseFloat(style.paddingBottom) || 0;
+
+                const clientW = this._el.clientWidth || elRect.width;
+                const clientH = this._el.clientHeight || elRect.height;
+
+                const availableWidth = clientW - padLeft - padRight;
+                const availableHeight = clientH - padTop - padBottom;
+
+                if (availableWidth <= 0 || availableHeight <= 0) return;
+
+                const cols = Math.max(1, Math.floor(availableWidth / charRect.width));
+                const rows = Math.max(1, Math.floor(availableHeight / charRect.height));
+
+                if (cols !== this._lastCols || rows !== this._lastRows) {
+                    this.resize(cols, rows);
+                }
+            };
+        }
+
         term = new Terminal({
             el:              document.querySelector('.terminal'),
             hostname:        BOOT_HOSTNAME,
@@ -431,6 +461,22 @@ function init() {
             permissions:     fs.permissions,
             onExit: () => { window.location.href = 'https://google.com/'; }
         });
+
+        globalThis.term = term;
+
+        window.addEventListener('resize', () => {
+            if (term && typeof term._measureAndSetSize === 'function') {
+                term._measureAndSetSize();
+            }
+        });
+
+        if (document.fonts && document.fonts.ready) {
+            document.fonts.ready.then(() => {
+                if (term && typeof term._measureAndSetSize === 'function') {
+                    term._measureAndSetSize();
+                }
+            });
+        }
 
         if (globalThis.Wbt) {
             const LocalCommand = Object.getPrototypeOf(term.cli.context.getCommand('cd'));
@@ -476,6 +522,9 @@ function init() {
         const container = document.getElementById('boot-container');
         container.classList.add('fade-out');
         document.getElementById('main-content').classList.add('visible');
+        if (term && typeof term._measureAndSetSize === 'function') {
+            term._measureAndSetSize();
+        }
         setTimeout(() => {
             boot.cleanup();
             container.style.display = 'none';
@@ -483,6 +532,9 @@ function init() {
         // Slide in the right panel after the fade completes (non-mobile only)
         setTimeout(() => {
             document.querySelector('.right').classList.add('slide-in');
+            if (term && typeof term._measureAndSetSize === 'function') {
+                term._measureAndSetSize();
+            }
         }, 500);
     });
 }
