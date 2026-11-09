@@ -12,15 +12,38 @@ if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
   echo "  askcv \"Tell me about Eliot's leadership experience\""
   echo "  askcv \"What technologies does Eliot have experience with?\""
 else
-  which wllama > /dev/null 2>&1 || wbt install wllama
+  # 1. Install wllama runtime if needed
+  if ! which wllama > /dev/null 2>&1; then
+    echo "Installing wllama (WebAssembly / WebGPU AI runtime)..."
+    wbt install wllama
+    echo "✓ wllama runtime installed"
+    echo ""
+  fi
 
+  # 2. Pull model if not already cached
+  if ! wllama models 2>/dev/null | grep -i "Qwen3.5" > /dev/null 2>&1; then
+    echo "Downloading AI model: Qwen 3.5 2B (Q4_K_M, ~1.28 GB)..."
+    echo "Note: Download happens once and is stored in browser cache."
+    echo ""
+    wllama pull \
+      --hf unsloth/Qwen3.5-2B-GGUF \
+      --quant Q4_K_M
+    echo "✓ Model downloaded and cached"
+    echo ""
+  fi
+
+  # 3. Run inference
   if [ $# -gt 0 ]; then
+    echo "Querying CV with Qwen 3.5 2B..."
+    echo ""
     wllama \
       --hf unsloth/Qwen3.5-2B-GGUF \
       --quant Q4_K_M \
       -s "$(cat /work/cv/system_prompt.txt)" \
       -p "$*"
   else
+    echo "Starting interactive chat with Qwen 3.5 2B..."
+    echo ""
     wllama \
       --hf unsloth/Qwen3.5-2B-GGUF \
       --quant Q4_K_M \
