@@ -42,4 +42,60 @@ jobs:
         aws cloudfront create-invalidation \
           --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
           --paths "/projects" "/projects/" "/projects/*" "/cv" "/cv/" "/cv/*" "/index.html" "/main.css*"
+    - name: Configure CloudFront Cross-Origin Isolation Headers
+      run: |
+        DIST_ID="${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}"
+        POLICY_NAME="CrossOriginIsolationPolicy"
+        
+        echo "Checking for existing CloudFront response headers policy..."
+        POLICY_ID=$(aws cloudfront list-response-headers-policies --type custom --query "ResponseHeadersPolicyList.Items[?ResponseHeadersPolicy.ResponseHeadersPolicyConfig.Name=='$POLICY_NAME'].ResponseHeadersPolicy.Id" --output text 2>/dev/null || true)
+        
+        if [ -z "$POLICY_ID" ] || [ "$POLICY_ID" = "None" ]; then
+          echo "Creating CloudFront Response Headers Policy ($POLICY_NAME)..."
+          POLICY_ID=$(aws cloudfront create-response-headers-policy \
+            --response-headers-policy-config '{
+              "Comment": "Enable Cross-Origin Isolation for WebAssembly multithreading",
+              "Name": "'"$POLICY_NAME"'",
+              "CustomHeadersConfig": {
+                "Quantity": 2,
+                "Items": [
+                  {
+                    "Header": "Cross-Origin-Opener-Policy",
+                    "Value": "same-origin",
+                    "Override": true
+                  },
+                  {
+                    "Header": "Cross-Origin-Embedder-Policy",
+                    "Value": "credentialless",
+                    "Override": true
+                  }
+                ]
+              }
+            }' --query "ResponseHeadersPolicy.Id" --output text 2>/dev/null || true)
+        fi
+        
+        if [ -n "$POLICY_ID" ] && [ "$POLICY_ID" != "None" ]; then
+          echo "Found / created policy with ID: $POLICY_ID"
+          echo "Checking CloudFront distribution configuration..."
+          CONFIG_JSON=$(aws cloudfront get-distribution-config --id "$DIST_ID" --output json 2>/dev/null || true)
+          if [ -n "$CONFIG_JSON" ]; then
+            ETAG=$(echo "$CONFIG_JSON" | jq -r '.ETag')
+            CURRENT_POLICY=$(echo "$CONFIG_JSON" | jq -r '.DistributionConfig.DefaultCacheBehavior.ResponseHeadersPolicyId // empty')
+            if [ "$CURRENT_POLICY" != "$POLICY_ID" ]; then
+              echo "Attaching policy $POLICY_ID to distribution $DIST_ID..."
+              echo "$CONFIG_JSON" | jq --arg pid "$POLICY_ID" '.DistributionConfig | .DefaultCacheBehavior.ResponseHeadersPolicyId = $pid' > /tmp/dist-config.json
+              aws cloudfront update-distribution \
+                --id "$DIST_ID" \
+                --if-match "$ETAG" \
+                --distribution-config file:///tmp/dist-config.json 2>/dev/null && echo "Successfully updated CloudFront distribution with Cross-Origin Isolation headers policy!" || echo "Notice: CloudFront distribution update requires cloudfront:UpdateDistribution IAM permissions. The client-side service worker will handle COOP/COEP."
+            else
+              echo "CloudFront distribution already has CrossOriginIsolationPolicy attached."
+            fi
+          else
+            echo "Notice: Could not retrieve CloudFront distribution config. The client-side service worker will handle COOP/COEP."
+          fi
+        else
+          echo "Notice: Could not create CloudFront response headers policy. The client-side service worker will handle COOP/COEP."
+        fi
+
 
