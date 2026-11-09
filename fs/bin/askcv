@@ -1,0 +1,22 @@
+#!/bin/sh
+
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+  echo "askcv - Ask questions about Eliot Stocker using local AI (wllama)"
+  echo ""
+  echo "Usage:"
+  echo "  askcv \"<question>\"    Ask a question about Eliot's experience"
+  echo "  askcv                 Start an interactive chat session about Eliot's CV"
+  echo ""
+  echo "Examples:"
+  echo "  askcv \"What did Eliot do at Snyk?\""
+  echo "  askcv \"Tell me about Eliot's leadership experience\""
+  echo "  askcv \"What technologies does Eliot have experience with?\""
+else
+  which wllama > /dev/null || wbt install wllama
+
+  if [ $# -gt 0 ]; then
+    wllama --hf Qwen/Qwen2.5-0.5B-Instruct-GGUF --quant Q4_K_M -s "$(cat /work/cv/system_prompt.txt)" -p "$*"
+  else
+    wllama --hf Qwen/Qwen2.5-0.5B-Instruct-GGUF --quant Q4_K_M -s "$(cat /work/cv/system_prompt.txt)"
+  fi
+fi
