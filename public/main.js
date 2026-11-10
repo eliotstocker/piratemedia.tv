@@ -418,17 +418,82 @@ async function resetFilesystem() {
 }
 globalThis.resetFilesystem = resetFilesystem;
 
+let serverCommandsBundle = null;
+let serverCommandMap = {};
+
+function extractCommandsBundle(u8) {
+    if (!u8 || !globalThis.Shell || !globalThis.Shell.BinaryContainer) return null;
+    try {
+        if (!globalThis.Shell.BinaryContainer.isBinaryContainer(u8)) return null;
+        const view = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+        const hlen = view.getUint32(8, true);
+        if (12 + hlen <= u8.byteLength) {
+            const header = JSON.parse(new TextDecoder().decode(u8.subarray(12, 12 + hlen)));
+            if (Array.isArray(header.commandsSlice)) {
+                const [off, len] = header.commandsSlice;
+                const payload = u8.subarray(12 + hlen);
+                return new TextDecoder().decode(payload.subarray(off, off + len));
+            }
+        }
+    } catch (_) {}
+    return null;
+}
+
+function collectCommandFunctions(node, path = "") {
+    const map = {};
+    function walk(curr, currPath) {
+        if (!curr || typeof curr !== "object" || curr instanceof Uint8Array) return;
+        for (const [k, v] of Object.entries(curr)) {
+            const p = `${currPath}/${k}`;
+            if (typeof v === "function") {
+                map[p] = v;
+                map[k] = v;
+            } else if (v && typeof v === "object" && !(v instanceof Uint8Array)) {
+                walk(v, p);
+            }
+        }
+    }
+    walk(node, path);
+    return map;
+}
+
+function relinkServerCommands(target, source) {
+    if (!target || !source || typeof target !== "object" || typeof source !== "object") return;
+    for (const [k, v] of Object.entries(source)) {
+        if (typeof v === "function") {
+            target[k] = v;
+        } else if (v && typeof v === "object" && !(v instanceof Uint8Array) && target[k] && typeof target[k] === "object" && !(target[k] instanceof Uint8Array)) {
+            relinkServerCommands(target[k], v);
+        }
+    }
+}
+
+function createAutoSaveHandler(key = FS_STORAGE_KEY) {
+    return (rawFs, rawPerms) => {
+        try {
+            if (!globalThis.Shell || !globalThis.Shell.BinaryContainer || !globalThis.Shell.Storage) return;
+            const options = serverCommandsBundle ? { commandsBundle: serverCommandsBundle } : {};
+            const bytes = globalThis.Shell.BinaryContainer.serializeBinaryFilesystem(rawFs, rawPerms, options);
+            if (typeof indexedDB !== "undefined") {
+                globalThis.Shell.Storage._idbPut(key, bytes).catch(() => {});
+            }
+        } catch (err) {
+            console.warn("Auto-save failed:", err);
+        }
+    };
+}
+
 async function loadFilesystem(url) {
     try {
         const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('reset') || window.location.hash === '#reset') {
-            console.log('Reset parameter detected. Purging persisted filesystem.');
+        if (urlParams.has("reset") || window.location.hash === "#reset") {
+            console.log("Reset parameter detected. Purging persisted filesystem.");
             await resetFilesystem();
-            if (urlParams.has('reset')) {
-                urlParams.delete('reset');
+            if (urlParams.has("reset")) {
+                urlParams.delete("reset");
                 const newSearch = urlParams.toString();
-                const newUrl = window.location.pathname + (newSearch ? '?' + newSearch : '') + window.location.hash;
-                window.history.replaceState(null, '', newUrl);
+                const newUrl = window.location.pathname + (newSearch ? "?" + newSearch : "") + window.location.hash;
+                window.history.replaceState(null, "", newUrl);
             }
         }
     } catch (_) {}
@@ -443,26 +508,9 @@ async function loadFilesystem(url) {
         savedHash = localStorage.getItem(FS_HASH_KEY);
     } catch (_) {}
 
-    // Check if we have a persisted snapshot that matches the current server build
-    if (savedHash && savedHash === serverHash && globalThis.Shell && globalThis.Shell.Storage) {
-        try {
-            const savedFs = await Shell.Storage.load(FS_STORAGE_KEY);
-            if (savedFs && savedFs.filesystem && typeof savedFs.filesystem === 'object') {
-                console.log('Loaded persisted filesystem snapshot from IndexedDB.');
-                return savedFs;
-            }
-        } catch (err) {
-            console.warn('Failed to load persisted filesystem snapshot, resetting to server image:', err);
-            await resetFilesystem();
-        }
-    } else if (savedHash && savedHash !== serverHash) {
-        console.log('New filesystem build detected. Resetting to server image.');
-        await resetFilesystem();
-    }
-
     let u8 = new Uint8Array(buf);
     if (u8[0] === 0x1f && u8[1] === 0x8b) {
-        const ds = new DecompressionStream('gzip');
+        const ds = new DecompressionStream("gzip");
         const writer = ds.writable.getWriter();
         writer.write(u8);
         writer.close();
@@ -474,10 +522,39 @@ async function loadFilesystem(url) {
         localStorage.setItem(FS_HASH_KEY, serverHash);
     } catch (_) {}
 
-    if (globalThis.Shell && globalThis.Shell.BinaryContainer) {
-        return globalThis.Shell.BinaryContainer.deserializeBinaryFilesystem(u8);
+    serverCommandsBundle = extractCommandsBundle(u8);
+    const serverFs = globalThis.Shell && globalThis.Shell.BinaryContainer
+        ? globalThis.Shell.BinaryContainer.deserializeBinaryFilesystem(u8)
+        : { filesystem: u8, permissions: {} };
+
+    if (serverFs && serverFs.filesystem) {
+        serverCommandMap = collectCommandFunctions(serverFs.filesystem);
     }
-    return { filesystem: u8, permissions: {} };
+
+    // Check if we have a persisted snapshot that matches the current server build
+    if (savedHash && savedHash === serverHash && globalThis.Shell && globalThis.Shell.Storage) {
+        try {
+            const savedData = await globalThis.Shell.Storage._idbGet(FS_STORAGE_KEY);
+            if (savedData && globalThis.Shell.BinaryContainer && globalThis.Shell.BinaryContainer.isBinaryContainer(savedData)) {
+                const savedFs = globalThis.Shell.BinaryContainer.deserializeBinaryFilesystem(savedData, serverCommandMap);
+                if (savedFs && savedFs.filesystem && typeof savedFs.filesystem === "object") {
+                    if (serverFs && serverFs.filesystem) {
+                        relinkServerCommands(savedFs.filesystem, serverFs.filesystem);
+                    }
+                    console.log("Loaded persisted filesystem snapshot from IndexedDB.");
+                    return savedFs;
+                }
+            }
+        } catch (err) {
+            console.warn("Failed to load persisted filesystem snapshot, resetting to server image:", err);
+            await resetFilesystem();
+        }
+    } else if (savedHash && savedHash !== serverHash) {
+        console.log("New filesystem build detected. Resetting to server image.");
+        await resetFilesystem();
+    }
+
+    return serverFs;
 }
 
 function init() {
@@ -541,7 +618,7 @@ function init() {
             lineWrap:        true,
             filesystem:      fs.filesystem,
             permissions:     fs.permissions,
-            onFsChange:      globalThis.Shell && globalThis.Shell.Storage ? globalThis.Shell.Storage.createAutoSave(FS_STORAGE_KEY) : null,
+            onFsChange:      createAutoSaveHandler(FS_STORAGE_KEY),
             onExit: () => { window.location.href = 'https://google.com/'; }
         };
 
@@ -580,6 +657,11 @@ function init() {
                 Object.setPrototypeOf(Wbt.prototype, LocalCommand.prototype);
             }
             term.cli.context.setCommand(Wbt);
+            if (typeof Wbt.restoreInstalled === "function") {
+                try {
+                    Wbt.restoreInstalled(term.cli);
+                } catch (_) {}
+            }
         }
 
         if (LocalCommand) {
