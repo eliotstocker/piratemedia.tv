@@ -384,6 +384,7 @@ function loadScript(src) {
 
 const FS_STORAGE_KEY = 'pmtv-rootfs';
 const FS_HASH_KEY = 'pmtv-fs-hash';
+const SIDEBAR_COLLAPSED_KEY = 'pmtv-sidebar-collapsed';
 
 async function computeBufferHash(buf) {
     if (window.crypto && window.crypto.subtle && typeof window.crypto.subtle.digest === 'function') {
@@ -557,9 +558,76 @@ async function loadFilesystem(url) {
     return serverFs;
 }
 
+function setSidebarCollapsed(collapsed, persist = true) {
+    const mainContent = document.getElementById('main-content');
+    const toggleBtn   = document.querySelector('.sidebar-toggle');
+    const toggleIcon  = document.querySelector('.sidebar-toggle-icon');
+    if (!mainContent) return;
+
+    const isCollapsed = Boolean(collapsed);
+    mainContent.classList.toggle('sidebar-collapsed', isCollapsed);
+
+    if (toggleBtn) {
+        const label = isCollapsed ? 'Show sidebar' : 'Hide sidebar';
+        toggleBtn.setAttribute('aria-expanded', isCollapsed ? 'false' : 'true');
+        toggleBtn.setAttribute('aria-label', label);
+        toggleBtn.setAttribute('title', label);
+    }
+
+    if (toggleIcon) {
+        toggleIcon.textContent = isCollapsed ? '\u00AB' : '\u00BB';
+    }
+
+    if (persist) {
+        try {
+            localStorage.setItem(SIDEBAR_COLLAPSED_KEY, isCollapsed ? '1' : '0');
+        } catch (_) {}
+    }
+
+    if (term && typeof term._measureAndSetSize === 'function') {
+        term._measureAndSetSize();
+    }
+}
+
+function initSidebarToggle() {
+    const mainContent = document.getElementById('main-content');
+    const toggleBtn   = document.querySelector('.sidebar-toggle');
+    const termEl      = document.querySelector('.terminal');
+    if (!mainContent || !toggleBtn) return;
+
+    let savedCollapsed = false;
+    try {
+        savedCollapsed = localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === '1';
+    } catch (_) {}
+    setSidebarCollapsed(savedCollapsed, false);
+
+    toggleBtn.addEventListener('click', (e) => {
+        const nextCollapsed = !mainContent.classList.contains('sidebar-collapsed');
+        setSidebarCollapsed(nextCollapsed, true);
+        if (e.detail > 0 && typeof e.currentTarget.blur === 'function') {
+            e.currentTarget.blur();
+        }
+    });
+
+    toggleBtn.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.stopPropagation();
+        }
+    });
+
+    if (termEl) {
+        termEl.addEventListener('transitionend', (e) => {
+            if (e.propertyName === 'width' && term && typeof term._measureAndSetSize === 'function') {
+                term._measureAndSetSize();
+            }
+        });
+    }
+}
+
 function init() {
     gaInit();
     startNoise();
+    initSidebarToggle();
 
     const boot = startBootAnimation();
 
