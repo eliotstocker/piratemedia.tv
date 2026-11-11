@@ -486,16 +486,11 @@ function createAutoSaveHandler(key = FS_STORAGE_KEY) {
 
 async function loadFilesystem(url) {
     try {
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has("reset") || window.location.hash === "#reset") {
-            console.log("Reset parameter detected. Purging persisted filesystem.");
+        const urlVars = urlToVariables();
+        if (Object.prototype.hasOwnProperty.call(urlVars, 'reset')) {
+            console.log('Reset parameter detected. Purging persisted filesystem.');
             await resetFilesystem();
-            if (urlParams.has("reset")) {
-                urlParams.delete("reset");
-                const newSearch = urlParams.toString();
-                const newUrl = window.location.pathname + (newSearch ? "?" + newSearch : "") + window.location.hash;
-                window.history.replaceState(null, "", newUrl);
-            }
+            removeUrlParams(['reset']);
         }
     } catch (_) {}
 
@@ -558,6 +553,90 @@ async function loadFilesystem(url) {
     return serverFs;
 }
 
+function parseSidebarParamValue(vars) {
+    if (!vars || typeof vars !== 'object') return null;
+
+    for (const key of ['collapse', 'collapsed']) {
+        if (Object.prototype.hasOwnProperty.call(vars, key)) {
+            const val = String(vars[key]).toLowerCase();
+            if (val === '' || val === '1' || val === 'true' || val === 'yes') return true;
+            if (val === '0' || val === 'false' || val === 'no') return false;
+        }
+    }
+
+    if (Object.prototype.hasOwnProperty.call(vars, 'sidebar')) {
+        const val = String(vars.sidebar).toLowerCase();
+        if (val === 'collapsed' || val === 'collapse' || val === 'hide' || val === 'hidden' || val === '0' || val === 'false') {
+            return true;
+        }
+        if (val === 'expanded' || val === 'expand' || val === 'open' || val === 'show' || val === '1' || val === 'true') {
+            return false;
+        }
+    }
+
+    return null;
+}
+
+function getSidebarCollapsedFromUrl() {
+    const hashState = parseSidebarParamValue(hashToVariables());
+    if (hashState !== null) return hashState;
+    return parseSidebarParamValue(searchToVariables());
+}
+
+function parseAberrationDisabledParam(vars) {
+    if (!vars || typeof vars !== 'object') return null;
+
+    for (const key of ['no-aberration', 'noaberration', 'no_aberration', 'no-chromatic-aberration', 'no-ca', 'noca']) {
+        if (Object.prototype.hasOwnProperty.call(vars, key)) {
+            const val = String(vars[key]).toLowerCase();
+            if (val === '' || val === '1' || val === 'true' || val === 'yes' || val === 'on') return true;
+            if (val === '0' || val === 'false' || val === 'no' || val === 'off') return false;
+        }
+    }
+
+    for (const key of ['aberration', 'chromatic-aberration', 'chromatic_aberration', 'chromaticaberration', 'chromatic', 'ca']) {
+        if (Object.prototype.hasOwnProperty.call(vars, key)) {
+            const val = String(vars[key]).toLowerCase();
+            if (val === '0' || val === '0px' || val === 'false' || val === 'off' || val === 'no' || val === 'none' || val === 'disabled') {
+                return true;
+            }
+            if (val === '1' || val === 'true' || val === 'on' || val === 'yes' || val === 'enabled') {
+                return false;
+            }
+        }
+    }
+
+    return null;
+}
+
+function getTextAberrationDisabledFromUrl() {
+    const hashState = parseAberrationDisabledParam(hashToVariables());
+    if (hashState !== null) return hashState;
+    return parseAberrationDisabledParam(searchToVariables());
+}
+
+function setTextAberrationDisabled(disabled) {
+    const mainContent = document.getElementById('main-content');
+    if (!mainContent) return;
+    mainContent.classList.toggle('no-aberration', Boolean(disabled));
+}
+
+function applyUrlVisualParams(isInitial = false) {
+    const urlCollapsed = getSidebarCollapsedFromUrl();
+    if (urlCollapsed !== null) {
+        setSidebarCollapsed(urlCollapsed, false);
+    } else if (isInitial) {
+        let savedCollapsed = false;
+        try {
+            savedCollapsed = localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === '1';
+        } catch (_) {}
+        setSidebarCollapsed(savedCollapsed, false);
+    }
+
+    const aberrationDisabled = getTextAberrationDisabledFromUrl();
+    setTextAberrationDisabled(Boolean(aberrationDisabled));
+}
+
 function setSidebarCollapsed(collapsed, persist = true) {
     const mainContent = document.getElementById('main-content');
     const toggleBtn   = document.querySelector('.sidebar-toggle');
@@ -595,14 +674,11 @@ function initSidebarToggle() {
     const termEl      = document.querySelector('.terminal');
     if (!mainContent || !toggleBtn) return;
 
-    let savedCollapsed = false;
-    try {
-        savedCollapsed = localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === '1';
-    } catch (_) {}
-    setSidebarCollapsed(savedCollapsed, false);
+    applyUrlVisualParams(true);
 
     toggleBtn.addEventListener('click', (e) => {
         const nextCollapsed = !mainContent.classList.contains('sidebar-collapsed');
+        removeUrlParams(['collapse', 'collapsed', 'sidebar']);
         setSidebarCollapsed(nextCollapsed, true);
         if (e.detail > 0 && typeof e.currentTarget.blur === 'function') {
             e.currentTarget.blur();
@@ -658,7 +734,17 @@ function init() {
                 const padTop = parseFloat(style.paddingTop) || 0;
                 const padBottom = parseFloat(style.paddingBottom) || 0;
 
-                const clientW = this._el.clientWidth || elRect.width;
+                let clientW = this._el.clientWidth || elRect.width;
+                const mainContent = document.getElementById('main-content');
+                if (mainContent && window.innerWidth >= 601) {
+                    const rootStyle = window.getComputedStyle(document.documentElement);
+                    const stripW = parseFloat(rootStyle.getPropertyValue('--sidebar-strip-width')) || 40;
+                    const targetOffsetW = mainContent.classList.contains('sidebar-collapsed')
+                        ? (window.innerWidth - stripW)
+                        : (window.innerWidth * 0.7);
+                    const scrollbarW = Math.max(0, (this._el.offsetWidth || 0) - (this._el.clientWidth || 0));
+                    clientW = targetOffsetW - scrollbarW;
+                }
                 const clientH = this._el.clientHeight || elRect.height;
 
                 const availableWidth = clientW - padLeft - padRight;
@@ -772,6 +858,7 @@ function init() {
             link.addEventListener('click', e => {
                 e.preventDefault && e.preventDefault();
                 const cmd  = e.currentTarget.getAttribute('data-command');
+                removeUrlParams(['cmd'], { fromSearch: true, fromHash: false });
                 const vars = hashToVariables();
                 vars.cmd   = cmd;
                 variablesToHash(vars);
@@ -803,20 +890,89 @@ function init() {
     });
 }
 
-function hashToVariables() {
-    if (!window.location.hash || window.location.hash === '#' || !window.location.hash.includes('=')) {
-        return {};
+function decodeUrlParamPart(str) {
+    try {
+        return decodeURIComponent(str.replace(/\+/g, '%20'));
+    } catch (_) {
+        return str.replace(/\+/g, ' ');
     }
-    return [
-        ...(window.location.hash.startsWith('#') ? window.location.hash.substring(1) : window.location.hash).split('&')
-    ].reduce((acc, v) => {
-        [k, v] = v.split('=');
-        return { ...acc, [k]: decodeURIComponent(v) };
+}
+
+function parseParamString(raw) {
+    if (!raw) return {};
+    return raw.split('&').filter(Boolean).reduce((acc, part) => {
+        const eqIdx = part.indexOf('=');
+        if (eqIdx === -1) {
+            acc[decodeUrlParamPart(part)] = '';
+        } else {
+            const k = decodeUrlParamPart(part.slice(0, eqIdx));
+            const v = decodeUrlParamPart(part.slice(eqIdx + 1));
+            acc[k] = v;
+        }
+        return acc;
     }, {});
 }
 
+function searchToVariables() {
+    const rawSearch = window.location.search ? window.location.search.replace(/^\?+/, '') : '';
+    return parseParamString(rawSearch);
+}
+
+function hashToVariables() {
+    const rawHash = window.location.hash ? window.location.hash.replace(/^#\??/, '') : '';
+    return parseParamString(rawHash);
+}
+
+function urlToVariables() {
+    return { ...searchToVariables(), ...hashToVariables() };
+}
+
+function serializeVariables(vars) {
+    return Object.entries(vars)
+        .map(([k, v]) => v === '' ? encodeURIComponent(k) : `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
+        .join('&');
+}
+
+function removeUrlParams(keys, { fromSearch = true, fromHash = true } = {}) {
+    try {
+        let changed = false;
+        const searchVars = searchToVariables();
+        const hashVars = hashToVariables();
+        const hashPrefix = window.location.hash && window.location.hash.startsWith('#?') ? '#?' : '#';
+
+        if (fromSearch) {
+            for (const key of keys) {
+                if (Object.prototype.hasOwnProperty.call(searchVars, key)) {
+                    delete searchVars[key];
+                    changed = true;
+                }
+            }
+        }
+
+        if (fromHash) {
+            for (const key of keys) {
+                if (Object.prototype.hasOwnProperty.call(hashVars, key)) {
+                    delete hashVars[key];
+                    changed = true;
+                }
+            }
+        }
+
+        if (changed) {
+            const newSearch = serializeVariables(searchVars);
+            const newHash = serializeVariables(hashVars);
+            const newUrl = window.location.pathname
+                + (newSearch ? '?' + newSearch : '')
+                + (newHash ? hashPrefix + newHash : '');
+            window.history.replaceState(null, '', newUrl);
+        }
+    } catch (_) {}
+}
+
 function variablesToHash(vars) {
-    window.location.hash = Object.entries(vars).map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join('&');
+    const serialized = serializeVariables(vars);
+    const useQuestionPrefix = window.location.hash && window.location.hash.startsWith('#?');
+    window.location.hash = serialized ? (useQuestionPrefix ? '?' + serialized : serialized) : '';
 }
 
 function cmdFromPath() {
@@ -827,18 +983,32 @@ function cmdFromPath() {
     return decodeURIComponent(pathname);
 }
 
+let lastHashCmd = null;
+
 function cmdFromHash(listen = false) {
-    const { cmd } = hashToVariables();
-    if (cmd) {
-        term.onCommand(cmd);
-    } else if (listen) {
-        const pathCmd = cmdFromPath();
-        if (pathCmd) {
-            term.onCommand(pathCmd);
-        }
-    }
+    applyUrlVisualParams(false);
+
+    const hashVars = hashToVariables();
+    const searchVars = searchToVariables();
+
     if (listen) {
-        window.addEventListener('hashchange', () => cmdFromHash());
+        const initialCmd = hashVars.cmd || searchVars.cmd || cmdFromPath();
+        lastHashCmd = hashVars.cmd || null;
+        if (initialCmd) {
+            term.onCommand(initialCmd);
+        }
+        window.addEventListener('hashchange', () => cmdFromHash(false));
+        window.addEventListener('popstate', () => applyUrlVisualParams(false));
+        return;
+    }
+
+    if (hashVars.cmd) {
+        if (hashVars.cmd !== lastHashCmd) {
+            lastHashCmd = hashVars.cmd;
+            term.onCommand(hashVars.cmd);
+        }
+    } else {
+        lastHashCmd = null;
     }
 }
 

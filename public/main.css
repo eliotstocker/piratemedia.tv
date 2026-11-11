@@ -181,6 +181,11 @@ body {
         var(--aberration) 0px 1px rgba(0, 0, 255, 0.5);
 }
 
+#main-content.no-aberration .terminal,
+#main-content.no-aberration .right {
+    text-shadow: none;
+}
+
 .sidebar-toggle {
     display: none;
 }
