@@ -16,6 +16,8 @@ Whilst my focus is on leadership, I'm not at all afraid to get my hands dirty, y
 
 I contribute to a number of open source communities, mostly in recent years IoT applications and drivers for systems like SmartThings and Hubitat. Not only do I enjoy giving back to the open source community, this keeps my coding knowledge up-to-date as I less frequently find myself writing code in my roles recently.
 
+Check out some of my recent [Projects & Open Source work](https://piratemedia.tv/projects).
+
 My wife and I are avid climbers. You will find me at the local bouldering gym at least 3 times a week, and not as frequently as I'd like at one of the southeast's great crags.
 
 Cooking, and food and drink in general are a passion of mine, I will often spend hours in the kitchen slow roasting, sous viding and smoking various ingredients into submission, or making a fine espresso based drink.
