@@ -41,5 +41,10 @@ md /work/cv/download.md
 
 echo " "
 echo -e "\e[1;38;2;0;192;255mTip:\e[0m You can ask questions about my experience using: \e[1;38;2;255;25;85maskcv \"questions about Eliot's experience\"\e[0m"
-echo -e "\e[1;38;2;0;192;255mTip:\e[0m View my open source projects using: \e[1;38;2;255;25;85mprojects\e[0m (\e[4;38;2;0;192;255m\e]8;;https://piratemedia.tv/projects\ahttps://piratemedia.tv/projects\e]8;;\a\e[0m)"
 echo " "
+printf "View open source projects? [Y/n]: "
+read answer
+case "$answer" in
+  [Nn]*) ;;
+  *) /projects ;;
+esac
