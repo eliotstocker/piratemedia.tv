@@ -36,7 +36,7 @@ And of course many more...
 # ![Attest Logo](https://avatars.githubusercontent.com/u/13132697?s=200&v=4) Attest
 
 ## Positions Held
-* __Director of Engineering__: Feb 2025 - Present
+* __Director of Engineering__: Jan 2023 - Present
 
 ## Company
 A leader in self-serve research and Insights tooling, Attest sets itself apart from the competition by pairing state-of-the-art technology with a team of caring and knowledgeable research and Insights professionals.
