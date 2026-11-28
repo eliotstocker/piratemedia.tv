@@ -1,17 +1,20 @@
 #!/bin/sh
 
-if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
-  echo "askcv - Ask questions about Eliot Stocker using local AI (wllama)"
+if [ $# -lt 1 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+  echo "askcv - Ask questions about Eliot Stocker using local in-browser AI"
   echo ""
   echo "Usage:"
   echo "  askcv \"<question>\"    Ask a question about Eliot's experience"
-  echo "  askcv                 Start an interactive chat session about Eliot's CV"
   echo ""
   echo "Examples:"
   echo "  askcv \"What did Eliot do at Snyk?\""
   echo "  askcv \"Tell me about Eliot's leadership experience\""
   echo "  askcv \"What technologies does Eliot have experience with?\""
 else
+  echo -e "\e[1;38;2;255;193;7m[Experimental]\e[0m askcv runs an LLM directly in your browser using WebAssembly / WebGPU."
+  echo -e "               All inference runs locally on your machine. Speed and accuracy may vary."
+  echo ""
+
   # 1. Install wllama runtime if needed
   if ! which wllama > /dev/null 2>&1; then
     echo "Installing wllama (WebAssembly / WebGPU AI runtime)..."
@@ -21,32 +24,46 @@ else
   fi
 
   # 2. Pull model if not already cached
-  if ! wllama models 2>/dev/null | grep -i "Qwen3.5" > /dev/null 2>&1; then
-    echo "Downloading AI model: Qwen 3.5 0.8B (Q4_K_M, ~508 MB)..."
-    echo "Note: Download happens once and is stored in browser cache."
+  if ! wllama models 2>/dev/null | grep -i "Llama-3.2-1B" > /dev/null 2>&1; then
+    echo "Downloading AI model: Llama 3.2 1B Instruct (Q2_K, ~580 MB)..."
+    echo "Note: Download happens once and is stored in your browser's persistent cache."
     echo ""
     wllama pull \
-      --hf unsloth/Qwen3.5-0.8B-GGUF \
-      --quant Q4_K_M
+      --hf bartowski/Llama-3.2-1B-Instruct-GGUF \
+      --quant Q2_K
     echo "✓ Model downloaded and cached"
     echo ""
   fi
 
-  # 3. Run inference
-  if [ $# -gt 0 ]; then
-    echo "Querying CV with Qwen 3.5 0.8B..."
-    echo ""
-    wllama \
-      --hf unsloth/Qwen3.5-0.8B-GGUF \
-      --quant Q4_K_M \
-      -s "$(cat /work/cv/system_prompt.txt)" \
-      -p "$*"
-  else
-    echo "Starting interactive chat with Qwen 3.5 0.8B..."
-    echo ""
-    wllama \
-      --hf unsloth/Qwen3.5-0.8B-GGUF \
-      --quant Q4_K_M \
-      -s "$(cat /work/cv/system_prompt.txt)"
-  fi
+  # 3. Agentic loop: model either answers or asks to READ a file, which we load into context and rerun
+  runAgent() {
+    ctx=""
+    n=0
+    while [ $n -lt 3 ]; do
+      n=$((n + 1))
+      out=$(wllama \
+        --hf bartowski/Llama-3.2-1B-Instruct-GGUF \
+        --quant Q2_K \
+        -s "$(cat /work/cv/router_prompt.txt)
+
+LOADED FILES:$ctx" \
+        -p "$1")
+      path=$(echo "$out" | grep -m1 -o 'READ: */[^ ]*' | sed 's/READ: *//')
+      # no valid new file requested means this is the final answer
+      if [ -z "$path" ] || [ ! -f "$path" ] || echo "$ctx" | grep -qF "=== $path ==="; then
+        echo "$out"
+        return
+      fi
+      echo -e "\e[2m[loading $path]\e[0m"
+      ctx="$ctx
+
+=== $path ===
+$(cat "$path")"
+    done
+    echo "$out"
+  }
+
+  echo "Querying CV with Llama 3.2 1B..."
+  echo ""
+  runAgent "$*"
 fi

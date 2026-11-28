@@ -1,1 +1,1 @@
-download a [PDF Copy of this CV Here](https://piratemedia.tv/cv.pdf)
+Download a [PDF Copy of this CV Here](https://piratemedia.tv/cv.pdf)
