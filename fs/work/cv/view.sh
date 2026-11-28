@@ -41,7 +41,8 @@ md /work/cv/download.md
 
 echo " "
 echo -e "\e[1;38;2;0;192;255mTip:\e[0m You can ask questions about my experience using in-browser AI \e[1;38;2;255;193;7m(Experimental)\e[0m:"
-echo -e "     \e[1;38;2;255;25;85maskcv \"questions about Eliot's experience\"\e[0m"
+echo -e "     \e[1;38;2;255;25;85maskcv\e[0m                      start a chat about my experience"
+echo -e "     \e[1;38;2;255;25;85maskcv \"your question\"\e[0m      ask one specific question"
 echo " "
 printf "View open source projects? [Y/n]: "
 read answer

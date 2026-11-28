@@ -1,10 +1,11 @@
 #!/bin/sh
 
-if [ $# -lt 1 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
   echo "askcv - Ask questions about Eliot Stocker using local in-browser AI"
   echo ""
   echo "Usage:"
   echo "  askcv \"<question>\"    Ask a question about Eliot's experience"
+  echo "  askcv                 Start an interactive chat (remembers previous questions)"
   echo ""
   echo "Examples:"
   echo "  askcv \"What did Eliot do at Snyk?\""
@@ -38,6 +39,7 @@ else
   # 3. Agentic loop: model either answers or asks to READ a file, which we load into context and rerun
   runAgent() {
     ctx=""
+    final=""
     n=0
     while [ $n -lt 3 ]; do
       n=$((n + 1))
@@ -46,13 +48,15 @@ else
         --quant Q2_K \
         -s "$(cat /work/cv/router_prompt.txt)
 
+CONVERSATION SO FAR:$history
+
 LOADED FILES:$ctx" \
         -p "$1")
       path=$(echo "$out" | grep -m1 -o 'READ: */[^ ]*' | sed 's/READ: *//')
       # no valid new file requested means this is the final answer
       if [ -z "$path" ] || [ ! -f "$path" ] || echo "$ctx" | grep -qF "=== $path ==="; then
-        echo "$out"
-        return
+        final="$out"
+        break
       fi
       echo -e "\e[2m[loading $path]\e[0m"
       ctx="$ctx
@@ -60,10 +64,23 @@ LOADED FILES:$ctx" \
 === $path ===
 $(cat "$path")"
     done
-    echo "$out"
+    final="${final:-$out}"
+    echo "$final"
+    # keep only question + final answer, capped so the prompt stays small
+    history=$(printf '%s\n\nUser: %s\nAssistant: %s' "$history" "$1" "$final" | tail -c 2000)
   }
 
-  echo "Querying CV with Llama 3.2 1B..."
-  echo ""
-  runAgent "$*"
+  history=""
+  if [ $# -gt 0 ]; then
+    echo "Querying CV with Llama 3.2 1B..."
+    echo ""
+    runAgent "$*"
+  else
+    echo "Interactive mode: ask about Eliot's CV (Ctrl+C to exit)"
+    echo ""
+    while printf "> " && read -r q; do
+      runAgent "$q"
+      echo ""
+    done
+  fi
 fi
